@@ -1,6 +1,6 @@
 inicio
-  // programação para seguir linha simples,
-  // funcionou relativamente bem somente para linha reta 
+  # programação para seguir linha simples,
+  # funcionou relativamente bem somente para linha reta 
   enquanto (verdadeiro) farei {
     se (cor(2) == "PRETO") entao {
       mover(300, negativo(100))
