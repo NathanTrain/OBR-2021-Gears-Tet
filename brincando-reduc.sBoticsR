@@ -1,0 +1,11 @@
+inicio
+  # programação para seguir linha simples,
+  # funcionou relativamente bem somente para linha reta 
+  enquanto (verdadeiro) farei {
+    se (cor(2) == "PRETO") entao {
+      mover(300, negativo(100))
+    } senao {
+      mover(negativo(100), 300)
+    }
+  }  
+fim
