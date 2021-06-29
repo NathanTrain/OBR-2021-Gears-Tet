@@ -1,11 +1,23 @@
+numero erro = 0 
+numero p = 0
+numero integral = 0
+numero i = 0
+numero d = 0
+numero lastErro = 0
+numero correcao = 0
+numero velocidade = 0
+
 inicio
-  # programação para seguir linha simples,
-  # funcionou relativamente bem somente para linha reta 
   enquanto (verdadeiro) farei {
-    se (cor(2) == "PRETO") entao {
-      mover(300, negativo(100))
-    } senao {
-      mover(negativo(100), 300)
-    }
-  }  
+    erro =  luz(1) - luz(2)
+    p = erro * 1
+    integral = integral + erro
+    i = integral * 0
+    d = erro - lastErro
+    lastErro = erro
+
+    correcao = p + i + d
+    mover(velocidade + correcao, velocidade - correcao)
+  }
+
 fim

@@ -1,11 +1,8 @@
 void Main () {
-  // se move mas é ruim, não consegue fazer curva :(
-    
   while (true) {
-    if (bc.Lightness(2) <= 10) {
-      bc.MoveFrontal(500, -200);
-    } else {
-      bc.MoveFrontal(-200, 500);      
-    }
+    bc.ClearConsole();
+    float erro = bc.Lightness(3) - 10;
+    float correcao = erro * 1;
+    bc.MoveFrontalAngles(100, correcao);
   }
 }
