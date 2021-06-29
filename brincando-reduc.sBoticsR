@@ -19,5 +19,4 @@ inicio
     correcao = p + i + d
     mover(velocidade + correcao, velocidade - correcao)
   }
-
 fim
