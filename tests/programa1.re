@@ -28,7 +28,20 @@ tarefa segueLinha {
 
 inicio
   enquanto (verdadeiro) farei {
-	  segueLinha()
+    # verifica quando o sensor de cor 1 ou 4 veem PRETO 
+    se ((cor(1) == "PRETO") e (cor(4) != "PRETO")) entao {
+      frenterotacao(100, 3)
+      # vira para a direita até encontrar PRETO com o sensor de cor 3
+      enquanto (cor(3) != "PRETO") farei {
+        direita(500)
+      }
+    } senao se ((cor(1) != "PRETO") e (cor(4) == "PRETO")) entao {
+      frenterotacao(100, 3)
+      # vira para a esquerda até encontrar PRETO com o sensor de cor 2
+      enquanto (cor(2) != "PRETO") farei {
+        esquerda(500)
+      }
+    }
+    segueLinha()
   }
-
 fim
