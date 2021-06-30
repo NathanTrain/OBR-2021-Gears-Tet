@@ -1,3 +1,6 @@
+
+# TUDO PRESENTE NESTE ARQUIVO FOI COLOCADO NO ARQUIVO PRINCIPAL !!!
+
 numero erro = 0
 numero p = 0
 numero i = 0
