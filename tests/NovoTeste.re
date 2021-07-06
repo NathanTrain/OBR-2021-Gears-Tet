@@ -17,19 +17,25 @@ booleano isLeft = falso
 booleano isRight = falso
 
 tarefa segueLinha {
-  erro = ((luz(2) - luz(3)) * calibracao)
-  p = erro * 50
-  integral = integral + erro
-  i = integral * 0.0001
-  d = (erro - lastErro) * 100
-  lastErro = erro
+  se ((cor(2) == "BRANCO") e ((cor(3) == "BRANCO"))) entao {
+    escrever(1, "frente")
+    frente(velocidade)
+  } senao {
+    escrever(1, "PID")
+    erro = ((luz(2) - luz(3)) * calibracao)
+    p = erro * 50
+    integral = integral + erro
+    i = integral * 0.0001
+    d = (erro - lastErro) * 100
+    lastErro = erro
 
-  PID = p + i + d
+    PID = p + i + d
 
-  correcaoE = (velocidade + PID)
-  correcaoD = (velocidade - PID)
+    correcaoE = (velocidade + PID)
+    correcaoD = (velocidade - PID)
 
-  mover(correcaoE, correcaoD)
+    mover(correcaoE, correcaoD)
+  }
 }
 
 tarefa parei {
@@ -39,6 +45,7 @@ tarefa parei {
 }
 
 inicio
+  ajustarcor(30)
   enquanto (verdadeiro) farei {
     # 1a verificação obstaculo
     # 2a verificação cores => 
