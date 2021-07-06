@@ -9,14 +9,15 @@ numero correcaoE = 0
 numero correcaoD = 0
 numero velocidade = 125
 
+numero calibracao = 0.5
+
 numero anguloAntigo = 0
 
 booleano isLeft = falso
 booleano isRight = falso
 
-
 tarefa segueLinha {
-  erro = (luz(2)) - (luz(3))
+  erro = ((luz(2) - luz(3)) * calibracao)
   p = erro * 50
   integral = integral + erro
   i = integral * 0.0001
