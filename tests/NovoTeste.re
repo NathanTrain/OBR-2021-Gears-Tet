@@ -9,7 +9,7 @@ numero correcaoE = 0
 numero correcaoD = 0
 numero velocidade = 125
 
-numero calibracao = 0.75
+numero calibracao = 0.6
 
 booleano isLeft = falso
 booleano isRight = falso
@@ -37,7 +37,7 @@ tarefa parei {
 }
 
 inicio
-  ajustarcor(20)
+  ajustarcor(25)
   enquanto (verdadeiro) farei {
     # 1a verificação obstaculo
     # 2a verificação cores => 
@@ -196,13 +196,7 @@ inicio
         isRight = falso
       }
 
-      se ((cor(2) == "BRANCO") e (cor(3) == "BRANCO")) entao {
-        escrever(1, "frente")
-        frente(velocidade)
-      } senao {
-        escrever(1, "PID")
-        segueLinha()
-      }
+      segueLinha()
     }
   }  
 fim
