@@ -11,8 +11,22 @@ numero velocidade = 125
 
 numero calibracao = 0.6
 
+numero horario = 7.5
+
 tarefa segueLinha {
-  erro = ((luz(2) - luz(3)) * calibracao)
+  # verifica o HORÁRIO DO DIA para saber como CORRIGIR a sombra
+  se ( ((horario > 7) e (horario < 7.75)) ou ((horario > 16.25) e (horario < 17.25)) ) entao {
+    se ( (direcao() > 75) e (direcao() < 105) ) entao {
+      erro = (((luz(2) - luz(3)) - 25) * calibracao)
+    } senao se ( (direcao() > 255) e (direcao() < 285) ) entao {
+      erro = (((luz(2) - luz(3)) + 25) * calibracao)
+    } senao {
+      erro = ((luz(2) - luz(3)) * calibracao)
+    }
+  } senao {
+    erro = ((luz(2) - luz(3)) * calibracao)
+  }
+  escrevernumero(1, erro)
   p = erro * 50
   integral = integral + erro
   i = integral * 0.0001
@@ -38,6 +52,13 @@ inicio
 
   # TODO => remover comentários 
   # TODO => adicionar verificação para quando estiver em rampa (subindo e descendo)
+  # TODO => adicionar verificação para, em determinada hora do dia, calibrar melhor
+  # TODO => quando direcao() estiver ~90 e ~270 usar verificação com BRANCO/BRANCO
+  #         para seguir linha (e não ver sombra com o gap)
+
+  # ideia para detectar que está na ÁREA DE RESGATE
+  #   => ultra(2) < 33 e ultra(3) < 33 e inclinação <= 345
+  #       => se ultra(1) < 500 --> chegou na ÁREA DE RESGATE
 
   enquanto (verdadeiro) farei {
     # 1a verificação obstaculo
