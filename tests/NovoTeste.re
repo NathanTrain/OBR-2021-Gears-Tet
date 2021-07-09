@@ -11,17 +11,23 @@ numero velocidade = 125
 
 numero calibracao = 0.6
 
-numero horario = 7.5
+numero horario = 9.5
 
 tarefa segueLinha {
+
+  # TODO => verificar novamente quais horários causam problemas (testar em RAMPA)
+  #         --> (RESOLVIDO DIFERENTE) 10h foi encontrado problema de uma pequena
+  #             diferença entre os sensores quando SUBINDO EM RAMPA
+  #             (em ambas as direções) 
+
   # verifica o HORÁRIO DO DIA para saber como CORRIGIR a sombra
-  se ( ((horario > 7) e (horario < 7.75)) ou ((horario > 16.25) e (horario < 17.25)) ) entao {
-    se ( (direcao() > 75) e (direcao() < 105) ) entao {
-      erro = (((luz(2) - luz(3)) - 25) * calibracao)
-    } senao se ( (direcao() > 255) e (direcao() < 285) ) entao {
-      erro = (((luz(2) - luz(3)) + 25) * calibracao)
+  se (((7 < horario) e (horario < 7.75)) ou ((16.25 < horario) e (horario < 17.25)) ) entao {
+    se ( (75 < direcao()) e (direcao() < 105) ) entao {
+        erro = (((luz(2) - luz(3)) - 25) * calibracao)
+    } senao se ( (255 < direcao()) e (direcao() < 285) ) entao {
+        erro = (((luz(2) - luz(3)) + 25) * calibracao)
     } senao {
-      erro = ((luz(2) - luz(3)) * calibracao)
+        erro = ((luz(2) - luz(3)) * calibracao)
     }
   } senao {
     erro = ((luz(2) - luz(3)) * calibracao)
@@ -41,6 +47,7 @@ tarefa segueLinha {
   mover(correcaoE, correcaoD)
 }
 
+# tarefa para debug somente
 tarefa parei {
   enquanto (verdadeiro) farei {
     parar()
@@ -48,17 +55,15 @@ tarefa parei {
 }
 
 inicio
-  ajustarcor(25)
+  ajustarcor(30)
 
-  # TODO => remover comentários 
-  # TODO => adicionar verificação para quando estiver em rampa (subindo e descendo)
-  # TODO => adicionar verificação para, em determinada hora do dia, calibrar melhor
-  # TODO => quando direcao() estiver ~90 e ~270 usar verificação com BRANCO/BRANCO
-  #         para seguir linha (e não ver sombra com o gap)
+  # TODO => remover comentários
+  # TODO (em processo) => adicionar verificação para, em determinada hora do dia, calibrar melhor
 
-  # ideia para detectar que está na ÁREA DE RESGATE
-  #   => ultra(2) < 33 e ultra(3) < 33 e inclinação <= 345
-  #       => se ultra(1) < 500 --> chegou na ÁREA DE RESGATE
+  # TODO:
+  #     ideia para detectar que está na ÁREA DE RESGATE
+  #     => ultra(2) < 33 e ultra(3) < 33 e inclinação <= 345
+  #        => se ultra(1) < 500 --> chegou na ÁREA DE RESGATE
 
   enquanto (verdadeiro) farei {
     # 1a verificação obstaculo
@@ -194,7 +199,30 @@ inicio
         }
         limparconsole()
       }
-      segueLinha()
+
+      se ((15 < inclinacao()) e (inclinacao() < 345)) entao {
+        velocidade = 100
+        se ((cor(2) == "BRANCO") e (cor(3) == "BRANCO")) entao {
+          escrever(3, "branco branco subindo")
+          frente(velocidade)
+        } senao {
+          escrever(3, "seguindo subindo")
+          segueLinha()
+        }
+      } senao se ((((0 <= direcao()) e (direcao() < 7)) ou ((353 < direcao()) e (direcao() <= 360))) ou ((83 < direcao()) e (direcao() < 97)) ou ((173 < direcao()) e (direcao() < 187)) ou ((263 < direcao()) e (direcao() < 277))) entao {
+        velocidade = 125
+        se ((cor(2) == "BRANCO") e (cor(3) == "BRANCO")) entao {
+          escrever(3, "branco branco quando reto")
+          frente(velocidade)
+        } senao {
+          escrever(3, "seguindo quando reto")
+          segueLinha()
+        }
+      } senao {
+        velocidade = 125
+        escrever(3, "seguindo normal")
+        segueLinha()
+      }
     }
   }  
 fim
