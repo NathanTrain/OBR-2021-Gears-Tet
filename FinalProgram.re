@@ -66,6 +66,14 @@ inicio
   # CALIBRAÇÃO DA COR
   ajustarcor(30)
 
+  # TODO => remover comentários
+  # TODO (em processo) => adicionar verificação para, em determinada hora do dia, calibrar melhor
+
+  # TODO:
+  #     ideia para detectar que está na ÁREA DE RESGATE
+  #     => ultra(2) < 33 e ultra(3) < 33 e inclinação <= 345
+  #        => se ultra(1) < 500 --> chegou na ÁREA DE RESGATE
+
   enquanto (verdadeiro) farei {
     # EXPLICAÇÃO DAS VERIFICAÇÕES
     #   1a verificação obstaculo
@@ -75,6 +83,15 @@ inicio
     #     segue linha
 
     se ((ultra(1) <= 10) e (cor(5) != "BRANCO")) entao {
+      # RESUMO:
+      # quando o sensor ultra da frente ver um obstaculo e
+      # o sensor de cor frontal verificar que é diferente de BRANCO
+      #   ele vira para a DIREITA, segue reto, vira para a ESQUERDA
+      #   e verifica com o sensor ultra da esquerda quando passar pelo obstáculo
+      #     quando passou, segue um pouco mais a frente e vira a ESQUERDA para
+      #     retornar à linha
+      #       ele segue reto até ver preto e depois vai mais um pouco,
+      #       virando 45° e depois até ver preto (para a DIREITA) 
       escrever(1, "encontrei um obstaculo")
 
       rotacionar(500, 90)
@@ -101,6 +118,33 @@ inicio
         direita(500)
       }
     } senao {
+      # RESUMO:
+      # PRIMEIRO -> VERIFICA SE HÁ VERDE EM ALGUM SENSOR DE COR
+      #     se houver:
+      #         para por 0.25 segundos para conferir aonde está a cor
+      #         se em ambos os lados:
+      #             virá 180°
+      #         se em somente um dos lados:
+      #             vai por 14 rotações para a frente, vira 20° para o lado respectivo
+      #             e continua virando até ver preto com o sensor respectivo:
+      #               se estiver virando para a direita, sensor 2; se para a esquerda, sensor 3
+      #         depois de realizar o movimento, retorna 4 rotações e volta a seguir linha
+      #     se não houver -> VERIFICA SE HÁ PRETO NOS EXTERNOS (1 e 4):
+      #         se houver -> para e espera 0.5 segundos para verificar aonde está o preto
+      #             se em ambos os lados:
+      #                 segue reto e volta a seguir linha
+      #             se somente em um lado:
+      #                 vai 3 rotações para a ferente e vira 4° para a direita
+      #                 entra em um ciclo para verificar se há preto na frente
+      #                   se houver, volta os 4° e sai do ciclo
+      #                   se não houver, volta os 4° e vai mais a frente, vira 90°
+      #                     para o lado respectivo e retorna 6 rotações, para então
+      #                     verificar se está na linha:
+      #                       virando o lado oposto até ver preto
+      #                       e dps para o lado respectivo até ver preto
+      #                     enfim: sai do ciclo e volta a seguir linha!
+      #         se não houver -> segue linha (normal)
+
       se (((cor(1) == "VERDE") ou (cor(2) == "VERDE")) ou ((cor(3) == "VERDE") ou (cor(4) == "VERDE"))) entao {
         escrever(1, "verde")
         parar()
@@ -198,6 +242,13 @@ inicio
         limparconsole()
       }
 
+      # SEGUE LINHA:
+      # PARA SEGUIR LINHA:
+      #     -> caso esteja em rampa OU esteja reto (nas direções NORTE SUL LESTE OESTE):
+      #         -> se os dois sensores da frente verem branco = segue em frente
+      #         -> se algum sensor ver algo diferente = segue linha
+      #     -> caso esteja em qualquer angulo diferente ou não esteja inclinado:
+      #         -> segue linha normalmente
       se ((15 < inclinacao()) e (inclinacao() < 345)) entao {
         velocidade = 100
         se ((cor(2) == "BRANCO") e (cor(3) == "BRANCO")) entao {
