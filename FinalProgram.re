@@ -8,7 +8,7 @@ numero lastErro = 0
 numero PID = 0
 numero correcaoE = 0
 numero correcaoD = 0
-numero velocidade = 125
+numero velocidade = 200
 
 numero calibracao = 0.6
 
@@ -16,8 +16,9 @@ numero calibracao = 0.6
   #   => o número inteiro é a hora (12:00 será 12)
   #   => o número após o ponto será os minutos, porém descritos como uma fração
   #      do horário (9:15 será 9.25; 10:45 será 10.75; e assim por diante)
-numero horario = 8
+numero horario = 12
 
+# SEGUIDOR DE LINHA PID
 tarefa segueLinha {
 
   # TODO => verificar novamente quais horários causam problemas (testar em RAMPA)
@@ -55,6 +56,19 @@ tarefa segueLinha {
   mover(correcaoE, correcaoD)
 }
 
+# SEGUIDOR DE LINHA PARA CASO HAJA BRANCO EM AMBOS OS SENSORES, SEGUIR EM FRENTE,
+# SENÃO, SEGUIR LINHA
+tarefa segueLinhaComBranco {
+  se ((cor(2) == "BRANCO") e (cor(3) == "BRANCO")) entao {
+    frente(150)
+  } senao {
+    segueLinha()
+  }
+}
+
+# TODO:
+  # tarefas para alinhamento (para colocar dentro das curvas em VERDE e PRETO)
+
 # tarefa para debug somente
 tarefa parei {
   enquanto (verdadeiro) farei {
@@ -64,18 +78,23 @@ tarefa parei {
 
 inicio
   # CALIBRAÇÃO DA COR
-  se ((horario < 8)) entao {
-    ajustarcor(40)
+  se ((horario < 8) ou (16 < horario)) entao {
+    ajustarcor(45)
+  } senao se (((8 <= horario) e (horario <= 11)) ou ((13 <= horario) e (horario <= 16))) entao  {
+    ajustarcor(35)
   } senao {
     ajustarcor(30)
   }
-
-  # TODO (em processo) => adicionar verificação para, em determinada hora do dia, calibrar melhor
 
   # TODO:
     #   ideia para detectar que está na ÁREA DE RESGATE
     #   => ultra(2) < 33 e ultra(3) < 33 e inclinação <= 345
     #      => se ultra(1) < 500 --> chegou na ÁREA DE RESGATE
+
+  # POSICIONANDO ATUADOR inicialmente:
+  velocidadeatuador(200)
+  levantar(500)
+  girarbaixo(500)
 
   enquanto (verdadeiro) farei {
     # EXPLICAÇÃO DAS VERIFICAÇÕES
@@ -114,7 +133,7 @@ inicio
         frente(100)
       }
 
-      frenterotacao(100, 16)
+      frenterotacao(200, 16)
       rotacionar(500, 45)
 
       enquanto (cor(3) != "PRETO") farei {
@@ -157,28 +176,42 @@ inicio
         esperar(250)
         se (((cor(1) == "VERDE") ou (cor(2) == "VERDE")) e ((cor(3) == "VERDE") ou (cor(4) == "VERDE"))) entao {
           rotacionar(200, 180)
+          trasrotacao(200, 4)
         } senao se ((cor(1) == "VERDE") ou (cor(2) == "VERDE") e ((cor(3) != "VERDE") e (cor(4) != "VERDE"))) entao {
-          frenterotacao(100, 14)
+          frenterotacao(200, 14)
           rotacionar(500, 20)
           enquanto (cor(3) != "PRETO") farei {
             direita(750)
           }
+          trasrotacao(200, 4)
+          enquanto (cor(2) != "PRETO") farei {
+            esquerda(750)
+          }
+          enquanto (cor(3) != "PRETO") farei {
+            direita(750)
+          }
         } senao se ((cor(1) != "VERDE") e (cor(2) != "VERDE") e ((cor(3) == "VERDE") ou (cor(4) == "VERDE"))) entao {
-          frenterotacao(100, 14)
+          frenterotacao(200, 14)
           rotacionar(500, negativo(20))
           enquanto (cor(2) != "PRETO") farei {
             esquerda(750)
           }
+          trasrotacao(200, 4)
+          enquanto (cor(3) != "PRETO") farei {
+            direita(750)
+          }
+          enquanto (cor(2) != "PRETO") farei {
+            esquerda(750)
+          }
         }
-        trasrotacao(100, 4)
         limparconsole()
       } senao se ((cor(1) == "PRETO") ou (cor(4) == "PRETO")) entao {
         parar()
         esperar(500)
         se ((cor(1) == "PRETO") e (cor(4) == "PRETO")) entao {
-          frenterotacao(100, 3)
+          frenterotacao(200, 3)
         } senao se ((cor(1) == "PRETO") e (cor(4) != "PRETO")) entao {
-          frenterotacao(100, 3)
+          frenterotacao(200, 3)
           rotacionar(500, 4)
 
           enquanto (verdadeiro) farei {
@@ -189,9 +222,9 @@ inicio
             } senao {
               rotacionar(500, negativo(4))
 
-              frenterotacao(100, 8)
+              frenterotacao(200, 8)
               rotacionar(500, 90)
-              trasrotacao(100, 5)
+              trasrotacao(200, 5)
 
               enquanto (cor(2) != "PRETO") farei {
                 esquerda(250)
@@ -204,7 +237,7 @@ inicio
             }
           }
         } senao se ((cor(1) != "PRETO") e (cor(4) == "PRETO")) entao {
-          frenterotacao(100, 3)
+          frenterotacao(200, 3)
           rotacionar(500, 4)
 
           enquanto (verdadeiro) farei {
@@ -215,9 +248,9 @@ inicio
             } senao {
               rotacionar(500, negativo(4))
 
-              frenterotacao(100, 8)
+              frenterotacao(200, 8)
               rotacionar(500, negativo(90))
-              trasrotacao(100, 5)
+              trasrotacao(200, 5)
 
               enquanto (cor(3) != "PRETO") farei {
                 direita(250)
@@ -237,23 +270,14 @@ inicio
       # SEGUE LINHA:
       # PARA SEGUIR LINHA:
         #   -> caso esteja em rampa OU esteja reto (nas direções NORTE SUL LESTE OESTE):
-        #       -> se os dois sensores da frente verem branco = segue em frente
-        #       -> se algum sensor ver algo diferente = segue linha
+        #       -> segue linha e caso veja branco, segue reto (como descrito anteriormente)
         #   -> caso esteja em qualquer angulo diferente ou não esteja inclinado:
         #       -> segue linha normalmente
 
       se ((15 < inclinacao()) e (inclinacao() < 345)) entao {
-        se ((cor(2) == "BRANCO") e (cor(3) == "BRANCO")) entao {
-          frente(velocidade)
-        } senao {
-          segueLinha()
-        }
+        segueLinhaComBranco()
       } senao se ((((0 <= direcao()) e (direcao() < 7)) ou ((353 < direcao()) e (direcao() <= 360))) ou ((83 < direcao()) e (direcao() < 97)) ou ((173 < direcao()) e (direcao() < 187)) ou ((263 < direcao()) e (direcao() < 277))) entao {
-        se ((cor(2) == "BRANCO") e (cor(3) == "BRANCO")) entao {
-          frente(95)
-        } senao {
-          segueLinha()
-        }
+        segueLinhaComBranco()
       } senao {
         segueLinha()
       }
