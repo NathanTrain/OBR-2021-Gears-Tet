@@ -10,7 +10,7 @@ numero correcaoE = 0
 numero correcaoD = 0
 numero velocidade = 200
 
-numero calibracao = 0.6
+numero reajuste = 0.6
 
 # HORÁRIO DESCRITO EM NUMERO COM VÍRGULA
   #   => o número inteiro é a hora (12:00 será 12)
@@ -30,14 +30,14 @@ tarefa segueLinha {
   # E DEFINE O ERRO COM BASE NA CORREÇÃO
   se (((7 < horario) e (horario < 7.75)) ou ((16.25 < horario) e (horario < 17.25)) ) entao {
     se ( (75 < direcao()) e (direcao() < 105) ) entao {
-        erro = (((luz(2) - luz(3)) - 25) * calibracao)
+        erro = (((luz(2) - luz(3)) - 25) * reajuste)
     } senao se ( (255 < direcao()) e (direcao() < 285) ) entao {
-        erro = (((luz(2) - luz(3)) + 25) * calibracao)
+        erro = (((luz(2) - luz(3)) + 25) * reajuste)
     } senao {
-        erro = ((luz(2) - luz(3)) * calibracao)
+        erro = ((luz(2) - luz(3)) * reajuste)
     }
   } senao {
-    erro = ((luz(2) - luz(3)) * calibracao)
+    erro = ((luz(2) - luz(3)) * reajuste)
   }
 
   # DEFININDO VALORES DO PID
@@ -60,14 +60,37 @@ tarefa segueLinha {
 # SENÃO, SEGUIR LINHA
 tarefa segueLinhaComBranco {
   se ((cor(2) == "BRANCO") e (cor(3) == "BRANCO")) entao {
-    frente(150)
+    frente(140)
   } senao {
     segueLinha()
   }
 }
 
-# TODO:
-  # tarefas para alinhamento (para colocar dentro das curvas em VERDE e PRETO)
+# AS TAREFAS alinhandoEsquerda E alinhandoDireita SÃO PARA QUANDO O ROBÔ
+  # REENCONTRA A LINHA E PRECISA SOMENTE SE ALINHAR SOBRE ELA, INDO DE UM LADO
+  # A OUTRO ATÉ ENCONTRAR PRETO
+tarefa alinhandoEsquerda {
+  enquanto (cor(2) != "PRETO") farei {
+    esquerda(750)
+  }
+  enquanto (cor(3) != "PRETO") farei {
+    direita(750)
+  }
+}
+tarefa alinhandoDireita {
+  enquanto (cor(3) != "PRETO") farei {
+    direita(750)
+  }
+  enquanto (cor(2) != "PRETO") farei {
+    esquerda(750)
+  }
+}
+
+# PARA QUE O ROBÔ PERCEBA COM MAIOR PRECISÃO AONDE ESTÁ, ELE DA UMA "PARADINHA"
+tarefa paradinha {
+  parar()
+  esperar(250)
+}
 
 # tarefa para debug somente
 tarefa parei {
@@ -87,22 +110,22 @@ inicio
   }
 
   # TODO:
-    #   ideia para detectar que está na ÁREA DE RESGATE
-    #   => ultra(2) < 33 e ultra(3) < 33 e inclinação <= 345
-    #      => se ultra(1) < 500 --> chegou na ÁREA DE RESGATE
+    # ideia para detectar que está na ÁREA DE RESGATE
+    # => ultra(2) < 33 e ultra(3) < 33 e inclinação <= 345
+    #    => se ultra(1) < 500 --> chegou na ÁREA DE RESGATE
 
-  # POSICIONANDO ATUADOR inicialmente:
+  # POSICIONANDO INICIALMENTE O ATUADOR:
   velocidadeatuador(200)
   levantar(500)
   girarbaixo(500)
 
   enquanto (verdadeiro) farei {
     # EXPLICAÇÃO DAS VERIFICAÇÕES
-      # 1a verificação obstaculo
-      # 2a verificação cores => 
+      # 1a verificação de obstaculo
+      # se não houver obstáculo: verificação de cores => 
       #   verde nos sensores 1 2 3 e 4
       #   preto nos sensores 1 e 4
-      #   segue linha
+      #   se não tiver nada: segue linha
 
     se ((ultra(1) <= 10) e (cor(5) != "BRANCO")) entao {
       # RESUMO:
@@ -116,6 +139,7 @@ inicio
         #       virando 45° e depois até ver preto (para a DIREITA e depois ESQUERDA)
         #       e da ré até o sensor ser pressionado 
 
+      paradinha()
       rotacionar(500, 90)
       frenterotacao(200, 16)
       rotacionar(500, negativo(90))
@@ -154,7 +178,7 @@ inicio
         #           vai por 14 rotações para a frente, vira 20° para o lado respectivo
         #           e continua virando até ver preto com o sensor respectivo:
         #             se estiver virando para a direita, sensor 2; se para a esquerda, sensor 3
-        #       depois de realizar o movimento, retorna 4 rotações e volta a seguir linha
+        #           volta 4 rotações e alinha-se sobre a linha, voltando a seguir linha
         #   se não houver -> VERIFICA SE HÁ PRETO NOS EXTERNOS (1 e 4):
         #       se houver -> para e espera 0.5 segundos para verificar aonde está o preto
         #           se em ambos os lados:
@@ -164,16 +188,13 @@ inicio
         #               entra em um ciclo para verificar se há preto na frente
         #                 se houver, volta os 4° e sai do ciclo
         #                 se não houver, volta os 4° e vai mais a frente, vira 90°
-        #                   para o lado respectivo e retorna 6 rotações, para então
-        #                   verificar se está na linha:
-        #                     virando o lado oposto até ver preto
-        #                     e dps para o lado respectivo até ver preto
-        #                   enfim: sai do ciclo e volta a seguir linha!
+        #                   para o lado respectivo e retorna 5 rotações, para então
+        #                   alinhar-se sobre a linha, saindo do ciclo em seguida
+        #                   e voltando a seguir linha!
         #       se não houver -> segue linha (normal)
 
       se (((cor(1) == "VERDE") ou (cor(2) == "VERDE")) ou ((cor(3) == "VERDE") ou (cor(4) == "VERDE"))) entao {
-        parar()
-        esperar(250)
+        paradinha()
         se (((cor(1) == "VERDE") ou (cor(2) == "VERDE")) e ((cor(3) == "VERDE") ou (cor(4) == "VERDE"))) entao {
           rotacionar(200, 180)
           trasrotacao(200, 4)
@@ -184,12 +205,7 @@ inicio
             direita(750)
           }
           trasrotacao(200, 4)
-          enquanto (cor(2) != "PRETO") farei {
-            esquerda(750)
-          }
-          enquanto (cor(3) != "PRETO") farei {
-            direita(750)
-          }
+          alinhandoEsquerda()
         } senao se ((cor(1) != "VERDE") e (cor(2) != "VERDE") e ((cor(3) == "VERDE") ou (cor(4) == "VERDE"))) entao {
           frenterotacao(200, 14)
           rotacionar(500, negativo(20))
@@ -197,17 +213,10 @@ inicio
             esquerda(750)
           }
           trasrotacao(200, 4)
-          enquanto (cor(3) != "PRETO") farei {
-            direita(750)
-          }
-          enquanto (cor(2) != "PRETO") farei {
-            esquerda(750)
-          }
+          alinhandoDireita()
         }
-        limparconsole()
       } senao se ((cor(1) == "PRETO") ou (cor(4) == "PRETO")) entao {
-        parar()
-        esperar(500)
+        paradinha()
         se ((cor(1) == "PRETO") e (cor(4) == "PRETO")) entao {
           frenterotacao(200, 3)
         } senao se ((cor(1) == "PRETO") e (cor(4) != "PRETO")) entao {
@@ -226,13 +235,7 @@ inicio
               rotacionar(500, 90)
               trasrotacao(200, 5)
 
-              enquanto (cor(2) != "PRETO") farei {
-                esquerda(250)
-              }
-              enquanto (cor(3) != "PRETO") farei {
-                direita(250)
-              }
-              limparlinha(2)
+              alinhandoEsquerda()
               interromper()
             }
           }
@@ -252,19 +255,11 @@ inicio
               rotacionar(500, negativo(90))
               trasrotacao(200, 5)
 
-              enquanto (cor(3) != "PRETO") farei {
-                direita(250)
-              }
-              enquanto (cor(2) != "PRETO") farei {
-                esquerda(250)
-              }
-
-              limparlinha(2)
+              alinhandoDireita()
               interromper()
             }
           }
         }
-        limparconsole()
       }
 
       # SEGUE LINHA:
