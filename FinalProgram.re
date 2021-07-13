@@ -16,7 +16,7 @@ numero reajuste = 0.6
   #   => o número inteiro é a hora (12:00 será 12)
   #   => o número após o ponto será os minutos, porém descritos como uma fração
   #      do horário (9:15 será 9.25; 10:45 será 10.75; e assim por diante)
-numero horario = 12
+numero horario = 8.75
 
 # SEGUIDOR DE LINHA PID
 tarefa segueLinha {
@@ -60,7 +60,7 @@ tarefa segueLinha {
 # SENÃO, SEGUIR LINHA
 tarefa segueLinhaComBranco {
   se ((cor(2) == "BRANCO") e (cor(3) == "BRANCO")) entao {
-    frente(140)
+    frente(125)
   } senao {
     segueLinha()
   }
@@ -103,7 +103,7 @@ inicio
   # CALIBRAÇÃO DA COR
   se ((horario < 8) ou (16 < horario)) entao {
     ajustarcor(45)
-  } senao se (((8 <= horario) e (horario <= 11)) ou ((13 <= horario) e (horario <= 16))) entao  {
+  } senao se (((8 <= horario) e (horario < 11)) ou ((13 < horario) e (horario <= 16))) entao  {
     ajustarcor(35)
   } senao {
     ajustarcor(30)
@@ -260,21 +260,21 @@ inicio
             }
           }
         }
-      }
-
-      # SEGUE LINHA:
-      # PARA SEGUIR LINHA:
-        #   -> caso esteja em rampa OU esteja reto (nas direções NORTE SUL LESTE OESTE):
-        #       -> segue linha e caso veja branco, segue reto (como descrito anteriormente)
-        #   -> caso esteja em qualquer angulo diferente ou não esteja inclinado:
-        #       -> segue linha normalmente
-
-      se ((15 < inclinacao()) e (inclinacao() < 345)) entao {
-        segueLinhaComBranco()
-      } senao se ((((0 <= direcao()) e (direcao() < 7)) ou ((353 < direcao()) e (direcao() <= 360))) ou ((83 < direcao()) e (direcao() < 97)) ou ((173 < direcao()) e (direcao() < 187)) ou ((263 < direcao()) e (direcao() < 277))) entao {
-        segueLinhaComBranco()
       } senao {
-        segueLinha()
+        # SEGUE LINHA:
+        # PARA SEGUIR LINHA:
+          #   -> caso esteja em rampa OU esteja reto (nas direções NORTE SUL LESTE OESTE):
+          #       -> segue linha e caso veja branco, segue reto (como descrito anteriormente)
+          #   -> caso esteja em qualquer angulo diferente ou não esteja inclinado:
+          #       -> segue linha normalmente
+
+        se ((15 < inclinacao()) e (inclinacao() < 345)) entao {
+          segueLinhaComBranco()
+        } senao se ((((0 <= direcao()) e (direcao() < 7)) ou ((353 < direcao()) e (direcao() <= 360))) ou ((83 < direcao()) e (direcao() < 97)) ou ((173 < direcao()) e (direcao() < 187)) ou ((263 < direcao()) e (direcao() < 277))) entao {
+          segueLinhaComBranco()
+        } senao {
+          segueLinha()
+        }
       }
     }
   }  
