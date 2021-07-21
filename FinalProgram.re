@@ -12,11 +12,15 @@ numero velocidade = 200
 
 numero reajuste = 0.6
 
+numero velocidadeBranco = 125
+
+numero alinhamento = 0
+
 # HORÁRIO DESCRITO EM NUMERO COM VÍRGULA
   #   => o número inteiro é a hora (12:00 será 12)
   #   => o número após o ponto será os minutos, porém descritos como uma fração
   #      do horário (9:15 será 9.25; 10:45 será 10.75; e assim por diante)
-numero horario = 8.75
+numero horario = 12
 
 # SEGUIDOR DE LINHA PID
 tarefa segueLinha {
@@ -60,10 +64,31 @@ tarefa segueLinha {
 # SENÃO, SEGUIR LINHA
 tarefa segueLinhaComBranco {
   se ((cor(2) == "BRANCO") e (cor(3) == "BRANCO")) entao {
-    frente(125)
+    frente(velocidadeBranco)
   } senao {
     segueLinha()
   }
+}
+
+tarefa alinhandoReto {
+  se (direcao() < 17) entao {
+    alinhamento = negativo(direcao())
+  } senao se (345 < direcao()) entao {
+    alinhamento = 360 - direcao()
+  } senao se (73 < direcao()) entao {
+    alinhamento = 90 - direcao()
+  } senao se (direcao() < 107) entao {
+    alinhamento = negativo(direcao() - 90)
+  } senao se (163 < direcao()) entao {
+    alinhamento = 180 - direcao()
+  } senao se (direcao() < 207) entao {
+    alinhamento = negativo(direcao() - 180)
+  } senao se (253 < direcao()) entao {
+    alinhamento = 270 - direcao()
+  } senao se (direcao() < 297) entao {
+    alinhamento = negativo(direcao() - 270)
+  }
+  rotacionar(100, alinhamento)
 }
 
 # AS TAREFAS alinhandoEsquerda E alinhandoDireita SÃO PARA QUANDO O ROBÔ
@@ -109,11 +134,6 @@ inicio
     ajustarcor(30)
   }
 
-  # TODO:
-    # ideia para detectar que está na ÁREA DE RESGATE
-    # => ultra(2) < 33 e ultra(3) < 33 e inclinação <= 345
-    #    => se ultra(1) < 500 --> chegou na ÁREA DE RESGATE
-
   # POSICIONANDO INICIALMENTE O ATUADOR:
   velocidadeatuador(200)
   levantar(500)
@@ -139,30 +159,38 @@ inicio
         #       virando 45° e depois até ver preto (para a DIREITA e depois ESQUERDA)
         #       e da ré até o sensor ser pressionado 
 
+      # TODO => alinhamento quando verificar objeto
       paradinha()
+      alinhandoReto()
+      paradinha()
+
       rotacionar(500, 90)
-      frenterotacao(200, 16)
-      rotacionar(500, negativo(90))
-
-      enquanto (ultra(3) > 10) farei {
+      enquanto (ultra(3) < 20) farei {
         frente(200)
       }
-      enquanto (ultra(3) < 10) farei {
-        frente(200)
-      }
-      frenterotacao(200, 15)
+      frenterotacao(200, 10)
       rotacionar(500, negativo(90))
 
-      enquanto ((cor(1) == "PRETO") ou (cor(2) == "PRETO") ou (cor(3) == "PRETO") ou (cor(4) == "PRETO")) farei {
-        frente(100)
+      enquanto (ultra(3) > 20) farei {
+        frente(200)
       }
+      enquanto (ultra(3) < 20) farei {
+        frente(200)
+      }
+      frenterotacao(200, 12)
+      rotacionar(500, negativo(90))
 
-      frenterotacao(200, 16)
+      enquanto (ultra(3) > 50) farei {
+        frente(200)
+      }
+      frenterotacao(200, 6.5)
       rotacionar(500, 45)
 
-      enquanto (cor(3) != "PRETO") farei {
+      enquanto (cor(4) != "PRETO") farei {
         direita(500)
       }
+      alinhandoEsquerda()
+      alinhandoReto()
 
       enquanto (toque(1) == falso) farei {
         tras(50)
@@ -235,7 +263,10 @@ inicio
               rotacionar(500, 90)
               trasrotacao(200, 5)
 
-              alinhandoEsquerda()
+              enquanto (cor(1) != "PRETO") farei {
+                esquerda(750)
+              }
+              alinhandoDireita()
               interromper()
             }
           }
@@ -245,7 +276,7 @@ inicio
 
           enquanto (verdadeiro) farei {
             se ((cor(2) == "PRETO") ou (cor(3) == "PRETO")) entao {
-              rotacionar(500, 4)
+              rotacionar(500, negativo(4))
               interromper()
 
             } senao {
@@ -255,7 +286,10 @@ inicio
               rotacionar(500, negativo(90))
               trasrotacao(200, 5)
 
-              alinhandoDireita()
+              enquanto (cor(4) != "PRETO") farei {
+                direita(750)
+              }
+              alinhandoEsquerda()
               interromper()
             }
           }
@@ -268,12 +302,16 @@ inicio
           #   -> caso esteja em qualquer angulo diferente ou não esteja inclinado:
           #       -> segue linha normalmente
 
-        se ((15 < inclinacao()) e (inclinacao() < 345)) entao {
-          segueLinhaComBranco()
-        } senao se ((((0 <= direcao()) e (direcao() < 7)) ou ((353 < direcao()) e (direcao() <= 360))) ou ((83 < direcao()) e (direcao() < 97)) ou ((173 < direcao()) e (direcao() < 187)) ou ((263 < direcao()) e (direcao() < 277))) entao {
-          segueLinhaComBranco()
+        se ((inclinacao() < 345) e ((ultra(2) < 40) e (ultra(3) < 40))) entao {
+          # NO MOMENTO ESTÁ EM OUTRO ARQUIVO
         } senao {
-          segueLinha()
+          se ((15 < inclinacao()) e (inclinacao() < 345)) entao {
+            segueLinhaComBranco()
+          } senao se ((((0 <= direcao()) e (direcao() < 7)) ou ((353 < direcao()) e (direcao() <= 360))) ou ((83 < direcao()) e (direcao() < 97)) ou ((173 < direcao()) e (direcao() < 187)) ou ((263 < direcao()) e (direcao() < 277))) entao {
+            segueLinhaComBranco()
+          } senao {
+            segueLinha()
+          }
         }
       }
     }
