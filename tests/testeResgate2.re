@@ -15,10 +15,12 @@ numero velocidadeBranco = 125
 
 numero alinhamento = 0
 
-numero contagem = 0
+numero contagem = 1
 
 numero contResgate = 0
 numero contSaida = 0
+
+numero linha = 0
 
 booleano saidaFrente = falso
 booleano saidaDireita = falso
@@ -99,93 +101,137 @@ tarefa parei {
   }
 }
 
+tarefa entregarVitima {
+  baixar(350)
+  velocidadeatuador(200)
+  girarbaixo(750)
+  esperar(500)
+  girarcima(750)
+  velocidadeatuador(100)
+  levantar(350)
+}
+
+# UMA ROTAÇÃO === 2.5 DISTANCIA
+
+tarefa andaParaLinha {
+  # verifica qual linha tem vítima andando de ré
+  # vira 90° quando encontrar
+  # executa alinhandoReto()
+  # anda reto até ter vitima no atuador por mais de 1 seg
+  # levanta atuador
+  # vai pro final da linha ou retorna (depende de onde estiver a área de resgate)
+  # leva a vítima até a área
+  # entrega a vítima, retorna o atuador
+  # retorna um pouco
+  # alinha novamente
+  # reinicia ciclo
+}
+
+
 tarefa verificaSala {
   zerartemporizador()
 
   enquanto (temporizador() < 3000) farei {
-    se ((160 < ultra(2)) e (ultra(2) < 225)) entao {
+    se (temalgo(2, 160, 225)) entao {
       contResgate = contResgate + 1
-    } senao se (ultra(2) < 160) entao {
-      # leitura de bola
     } senao se (300 < ultra(2)) entao {
       contSaida = contSaida + 1
     }
-    frente(100)
-  limparlinha(1)
+    frente(125)
   }
 
   zerartemporizador()
 
+  # verificações:
+    # saída na direita
+      # resgate na frente
+      # resgate direita cima
+    # resgate direita baixo
+      # saída na esquerda
+      # saída na frente
+    # senao
+      # resgate na frente E saída na frente
+      # resgate direita cima E saída na esquerda
+
   se (contSaida > contResgate) entao {
     saidaDireita = verdadeiro
-    escrever(1, "saidaDireita")
 
     enquanto (verdadeiro) farei {
-      se (temporizador() > 4500) entao {
-        escrever(2, "resgateFrente")
+      se (temporizador() > 4000) entao {
         resgateFrente = verdadeiro
-
-        levantar(500)
-        frenterotacao(200, 4)
-        girarbaixo(250)
-        baixar(250)
-
         interromper()
-      } senao se (ultra(1) < 60) entao {
-        escrever(2, "resgateDireitaCima")
+      } senao se (ultra(1) <= 85) entao {
         resgateDireitaCima = verdadeiro
         interromper()
       } senao {
-        frente(150)
+        frente(125)
       }
     }
+
   } senao se (contResgate > contSaida) entao {
     resgateDireitaBaixo = verdadeiro
-    escrever(1, "resgateDireitaBaixo")
 
     enquanto (verdadeiro) farei {
-      se (ultra(3) > 50) entao {
-        escrever(2, "saidaEsquerda")
+      se ((ultra(3) > 50) e (ultra(1) <= 85)) entao {
         saidaEsquerda = verdadeiro
         interromper()
-      } senao se (ultra(1) < 40) entao {
-        escrever(2, "saidaFrente")
+      } senao se (ultra(1) <= 85) entao {
         saidaFrente = verdadeiro
         interromper()
       } senao {
-        frente(150)
+        frente(125)
       }
     }
+
   } senao {
     enquanto (verdadeiro) farei {
       se (temporizador() > 3500) entao {
-        escrever(1, "resgateFrente")
-        escrever(2, "saidaFrente")
         resgateFrente = verdadeiro
         saidaFrente = verdadeiro
-
-        levantar(500)
-        frenterotacao(200, 4)
-        girarbaixo(250)
-        baixar(250)
-
         interromper()
-      } senao se (ultra(3) > 50) entao {
-        escrever(1, "saidaEsquerda")
-        escrever(2, "resgateDireitaCima")
+      } senao se ((ultra(3) > 50) e (ultra(1) <= 85)) entao {
         saidaEsquerda = verdadeiro
         resgateDireitaCima = verdadeiro
         interromper()
       } senao {
-        frente(150)
+        frente(125)
       }
     }
   }
 
   parar()
-  levantar(500)
-  limparconsole()
+
+  # TODO => transformar em tarefa resgateDeVitimas
+
+  se ((saidaDireita) e (resgateFrente)) entao {
+    escrever(1, "saidaDireita")
+    escrever(2, "resgateFrente")
+
+  } senao se ((saidaDireita) e (resgateDireitaCima)) entao {
+    escrever(1, "saidaDireita")
+    escrever(2, "resgateDireitaCima")
+
+  } senao se ((saidaEsquerda) e (resgateDireitaBaixo)) entao {
+    escrever(1, "saidaEsquerda")
+    escrever(2, "resgateDireitaBaixo")
+
+  } senao se ((saidaEsquerda) e (resgateDireitaCima)) entao {
+    escrever(1, "saidaEsquerda")
+    escrever(2, "resgateDireitaCima")
+
+  } senao se ((saidaFrente) e (resgateDireitaBaixo)) entao {
+    escrever(1, "saidaFrente")
+    escrever(2, "resgateDireitaBaixo")
+
+  } senao se ((saidaFrente) e (resgateFrente)) entao {
+    escrever(1, "saidaFrente")
+    escrever(2, "resgateFrente")
+
+  }
+
   parei()
+  entregarVitima()
+  limparconsole()
 }
 
 inicio
@@ -200,38 +246,41 @@ inicio
       paradinha()
       zerartemporizador()
 
+      velocidadeatuador(500)
+      baixar(100)
+      velocidadeatuador(100)
+
       velocidadeBranco = 250
-      enquanto ((inclinacao() != 0) e (ultra(2) != 10)) farei {
-        se ((temporizador() >= 1500) e (temporizador() <= 1600)) entao {
-          parar()
-          velocidadeatuador(500)
-          baixar(500)
-          enquanto (angulogiroatuador() > 10) farei {
-            girarcima(1)
-          }
-        }
+      enquanto (inclinacao() != 0) farei {
         segueLinhaComBranco()
       }
       velocidadeBranco = 125
 
       # NA SALA DE RESGATE
       paradinha()
-      alinhandoReto()
-      paradinha()
-      alinhandoReto()
+      para contagem de 1 ate 3 passo 1 farei {
+        alinhandoReto()
+        paradinha()
+      }
+      contagem = 1
+
+      frenterotacao(200, 20)
+      trasrotacao(200, 20)
+
       paradinha()
 
-      velocidadeatuador(100)
-      enquanto (modulo(angulogiroatuador()) != 358) farei {
-        girarbaixo(1)
+      enquanto (angulogiroatuador() > 15) farei {
+        girarcima(1)
       }
-      enquanto (modulo(anguloatuador()) != 12) farei {
-        baixar(1)
+      enquanto (angulogiroatuador() < 15) farei {
+        girarcima(1)
       }
-      paradinha()
+      baixar(750)
 
       # ANALISANDO A SALA
       verificaSala()
+
+      parei()
 
     } senao {
       se ((15 < inclinacao()) e (inclinacao() < 345)) entao {
