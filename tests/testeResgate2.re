@@ -125,6 +125,19 @@ tarefa andaParaLinha {
   # retorna um pouco
   # alinha novamente
   # reinicia ciclo
+
+  # se sEsquerda e rDireitaCima
+    #
+  # se sEsquerda e rDireitaBaixo 
+    #
+  # se sDireita e rDireitaCima
+    #
+  # se sDireita e rFrente
+    #
+  # se sFrente e rDireitaBaixo
+    #
+  # se sFrente e rFrente
+
 }
 
 
