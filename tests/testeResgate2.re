@@ -957,6 +957,7 @@ tarefa encontraPegaVitima {
 
   }
 
+  # utilizar alinhandoEsquerda e alinhandoDireita quando sair da sala
   limparconsole()
 }
 

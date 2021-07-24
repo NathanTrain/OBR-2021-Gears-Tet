@@ -12,7 +12,7 @@ numero velocidade = 200
 
 numero reajuste = 0.6
 
-numero velocidadeBranco = 125
+numero velocidadeBranco = 100
 
 numero alinhamento = 0
 
@@ -20,7 +20,7 @@ numero alinhamento = 0
   #   => o número inteiro é a hora (12:00 será 12)
   #   => o número após o ponto será os minutos, porém descritos como uma fração
   #      do horário (9:15 será 9.25; 10:45 será 10.75; e assim por diante)
-numero horario = 12
+numero horario = 14.75
 
 # SEGUIDOR DE LINHA PID
 tarefa segueLinha {
@@ -159,7 +159,6 @@ inicio
         #       virando 45° e depois até ver preto (para a DIREITA e depois ESQUERDA)
         #       e da ré até o sensor ser pressionado 
 
-      # TODO => alinhamento quando verificar objeto
       paradinha()
       alinhandoReto()
       paradinha()
@@ -302,8 +301,12 @@ inicio
           #   -> caso esteja em qualquer angulo diferente ou não esteja inclinado:
           #       -> segue linha normalmente
 
-        se ((inclinacao() < 345) e ((ultra(2) < 40) e (ultra(3) < 40))) entao {
-          # NO MOMENTO ESTÁ EM OUTRO ARQUIVO
+        se (((340 < inclinacao()) e (inclinacao() < 350)) e ((ultra(2) < 40) e (ultra(3) < 40))) entao {
+          enquanto (inclinacao() != 0) farei {
+            segueLinhaComBranco()
+          }
+          frenterotacao(250, 5)
+          parei()
         } senao {
           se ((15 < inclinacao()) e (inclinacao() < 345)) entao {
             segueLinhaComBranco()
