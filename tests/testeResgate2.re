@@ -136,7 +136,7 @@ tarefa encontraPegaVitima {
   velocidadeatuador(100)
 
   # TODO
-    # [] sDireita rFrente
+    # [X] sDireita rFrente
     # [] sDireita rDireitaCima
     # [X] sEsquerda rDireitaBaixo
     # [X] sEsquerda rDireitaCima
@@ -144,21 +144,253 @@ tarefa encontraPegaVitima {
     # [X] sFrente rFrente
 
   se ((saidaDireita) e (resgateFrente)) entao {
-    escrever(1, "saidaDireita")
-    escrever(2, "resgateFrente")
-    se (temvitima()) entao {
-      escrever(3, "tem vitima")
-      # entregar
+    baixar(1000)
+
+    # verificação vertical
+    enquanto (verdadeiro) farei {
+      alinhandoReto()
+      # anda até ver vítima
+      enquanto (verdadeiro) farei {
+        se (temalgo(2, 0, 195)) entao {
+          trasrotacao(125, 5)
+
+          se (temalgo(2, 0, 40)) entao {
+            vitimaProxima = verdadeiro
+          }
+
+          interromper()
+        } senao {
+          se ((ultra(2) > 300) e (ultra(1) > 248)) entao {
+            interromper()
+          } senao {
+            tras(125)
+          }
+        }
+      }
+      paradinha()
+      alinhandoReto()
+
+      # verifica se chegou ao final da sala
+      se ((ultra(2) > 300) e (ultra(1) > 248)) entao {
+        interromper()
+      }
+
+      se (vitimaProxima) entao {
+        levantar(400)
+
+        rotacionar(500, 90)
+        alinhandoReto()
+
+        frenterotacao(250, 10)
+        trasrotacao(250, 10)
+
+        baixar(600)
+        alinhandoReto()
+
+        vitimaProxima = falso
+      } senao {
+        # vira 90°
+        rotacionar(500, 90)
+        alinhandoReto()
+      }
+
+      # segue até a parede
+      alinhandoReto()
+      zerartemporizador()
+      enquanto (corverde(2) > 30) farei {
+        se (ultra(1) < 30) entao {
+          interromper()
+        } senao se (temporizador() >= 8000) entao {
+          interromper()
+        } senao {
+          frente(125)
+        }
+      }
+
+      levantar(400)
+
+      paradinha()
+
+      # já está do outro lado da sala
+      # retorna e segue para entregar vitima
+      enquanto (toque(1) == falso) farei {
+        tras(125)
+      }
+      paradinha()
+      frenterotacao(250, 15)
+      alinhandoReto()
+
+      rotacionar(500, negativo(90))
+      alinhandoReto()
+
+      se (temvitima()) entao {
+        enquanto (corvermelha(5) > 2) farei {
+          frente(250)
+        }
+        rotacionar(500, negativo(45))
+        atuadorEntregaVitima()
+        rotacionar(500, 45)
+
+        alinhandoReto()
+        trasrotacao(250, 10)
+      }
+      baixar(600)
     }
+
+    frenterotacao(250, 5)
+    rotacionar(500, 90)
+    alinhandoReto()
+
+    # verificação horizontal
+    enquanto (verdadeiro) farei {
+      alinhandoReto()
+
+      # anda até ver vítima
+      enquanto (verdadeiro) farei {
+        se (temalgo(3, 0, 160)) entao {
+          frenterotacao(125, 5)
+          se (ultra(2) > 100) entao {
+            temArea = verdadeiro
+          }
+
+          se (temalgo(3, 0, 40)) entao {
+            vitimaProxima = verdadeiro
+          }
+          interromper()
+        } senao {
+          frente(125)
+          se ((30 < corverde(2)) e (corverde(2) < 38)) entao {
+            interromper()
+          }
+        }
+      }
+      paradinha()
+      alinhandoReto()
+
+      # verifica se chegou ao final da sala
+      se ((30 < corverde(2)) e (corverde(2) < 38)) entao {
+        interromper()
+      }
+
+      se (vitimaProxima) entao {
+        levantar(400)
+
+        rotacionar(500, negativo(90))
+        alinhandoReto()
+
+        frenterotacao(250, 10)
+        trasrotacao(250, 10)
+
+        baixar(500)
+        alinhandoReto()
+
+        se (temArea) entao {
+          zerartemporizador()
+          enquanto ((temporizador() < 5000) e (ultra(1) > 110)) farei {
+            frente(125)
+          }
+        } senao {
+          zerartemporizador()
+          enquanto (ultra(1) > 35) farei {
+            frente(125)
+          }
+        }
+
+        vitimaProxima = falso
+
+      } senao {
+        # vira 90°
+        rotacionar(500, negativo(90))
+        alinhandoReto()
+
+        # segue até a parede
+        zerartemporizador()
+        enquanto (ultra(1) > 35) farei {
+          frente(125)
+        }
+
+      }
+
+      frenterotacao(125, 2)
+      levantar(400)
+      # já está do outro lado da sala
+
+      # se a área estiver na frente dele, entrega vitima
+      se (temArea e temvitima()) entao {
+        rotacionar(250, negativo(45))
+
+        enquanto (corvermelha(5) > 2) farei {
+          frente(250)
+        }
+        paradinha()
+
+        atuadorEntregaVitima()
+        rotacionar(250, 45)
+        alinhandoReto()
+      }
+
+      se (temvitima()) entao {
+        trasrotacao(125, 5)
+        alinhandoReto()
+        rotacionar(500, negativo(90))
+        alinhandoReto()
+
+        zerartemporizador()
+        enquanto (corvermelha(5) > 2) farei {
+          frente(250)
+        }
+        tempoDeRetorno = temporizador()
+
+        rotacionar(500, 45)
+        atuadorEntregaVitima()
+        rotacionar(500, negativo(45))
+        alinhandoReto()
+
+        tras(250)
+        esperar(tempoDeRetorno)
+
+        rotacionar(500, 90)
+        alinhandoReto()
+      }
+
+      se (temArea) entao {
+        baixar(500)
+        enquanto (ultra(1) > 235) farei {
+          tras(350)
+        }
+      } senao {
+        enquanto (toque(1) == falso) farei {
+          tras(350)
+        }
+        alinhandoReto()
+        frenterotacao(250, 5)
+        baixar(500)
+      }
+
+      rotacionar(500, 90)
+      temArea = falso
+    }
+
+    trasrotacao(250, 10)
+    rotacionar(500, negativo(90))
+    alinhandoReto()
+
+    enquanto (toque(1) == falso) farei {
+      tras(250)
+    }
+    frenterotacao(250, 10)
+
+    rotacionar(500, 90)
+    alinhandoReto()
+
+    enquanto (38 < corverde(2)) farei {
+      frente(250)
+    }
+    parar()
 
   } senao se ((saidaDireita) e (resgateDireitaCima)) entao {
     escrever(1, "saidaDireita")
     escrever(2, "resgateDireitaCima")
-    se (temvitima()) entao {
-      escrever(3, "tem vitima")
-      # entregar
-    }
-
   } senao se ((saidaEsquerda) e (resgateDireitaBaixo)) entao {
 
     enquanto(ultra(1) > 30) farei {
@@ -174,7 +406,7 @@ tarefa encontraPegaVitima {
       alinhandoReto()
 
       enquanto (toque(1) == falso) farei {
-        tras(250)
+        tras(125)
       }
 
       frenterotacao(125, 10)
@@ -1423,7 +1655,7 @@ tarefa encontraPegaVitima {
       # já está do outro lado da sala
       # retorna e segue para entregar vitima
       enquanto (toque(1) == falso) farei {
-        tras(250)
+        tras(125)
       }
       paradinha()
       frenterotacao(250, 15)
@@ -1610,7 +1842,7 @@ tarefa encontraPegaVitima {
       levantar(400)
 
       enquanto (toque(1) == falso) farei {
-        tras(250)
+        tras(125)
       }
       paradinha()
       frenterotacao(250, 15)
@@ -1678,15 +1910,14 @@ tarefa encontraPegaVitima {
 
   frenterotacao(250, 5)
   alinhandoReto()
-  # utilizar alinhandoEsquerda e alinhandoDireita quando sair da sala
+  # TODO => utilizar alinhandoEsquerda e alinhandoDireita quando sair da sala
 
   velocidadeatuador(200)
-  girarbaixo(500)
   levantar(500)
+  girarbaixo(500)
 
   limparconsole()
 }
-
 
 tarefa verificaSala {
   zerartemporizador()
@@ -1711,26 +1942,31 @@ tarefa verificaSala {
       # resgate na frente E saída na frente
       # resgate direita cima E saída na esquerda
 
+  paradinha()
+
   zerartemporizador()
+
   se (contSaida > contResgate) entao {
     saidaDireita = verdadeiro
-    levantar(400)
+    levantar(700)
 
     enquanto (verdadeiro) farei {
       se (corvermelha(5) < 2) entao {
+        se (temvitima()) entao {
+          atuadorEntregaVitima()
+        }
         trasrotacao(250, 15)
         parar()
         resgateFrente = verdadeiro
         interromper()
-      } senao se (ultra(1) <= 75) entao {
+      } senao se (temporizador() >= 7500) entao {
         trasrotacao(250, 15)
         parar()
-        baixar(500)
+        baixar(1000)
         resgateDireitaCima = verdadeiro
         interromper()
-      } senao {
-        frente(125)
       }
+      frente(125)
     }
 
   } senao se (contResgate > contSaida) entao {
@@ -1749,9 +1985,12 @@ tarefa verificaSala {
     }
 
   } senao {
-    levantar(400)
+    levantar(700)
     enquanto (verdadeiro) farei {
       se (corvermelha(5) < 2) entao {
+        se (temvitima()) entao {
+          atuadorEntregaVitima()
+        }
         trasrotacao(250, 15)
         parar()
         resgateFrente = verdadeiro
@@ -1760,7 +1999,7 @@ tarefa verificaSala {
       } senao se (ultra(3) > 50) entao {
         trasrotacao(250, 15)
         parar()
-        baixar(500)
+        baixar(1000)
         saidaEsquerda = verdadeiro
         resgateDireitaCima = verdadeiro
         interromper()
