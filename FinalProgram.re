@@ -88,7 +88,7 @@ tarefa alinhandoReto {
   } senao se ((270 <= direcao()) e (direcao() < 315)) entao {
     alinhamento = negativo((direcao() - 270))
   }
-  rotacionar(50, arredondar(alinhamento))
+  rotacionar(100, arredondar(alinhamento))
 }
 
 # AS TAREFAS alinhandoEsquerda E alinhandoDireita SÃO PARA QUANDO O ROBÔ

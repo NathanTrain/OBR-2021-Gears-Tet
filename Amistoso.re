@@ -1,4 +1,4 @@
-numero horario = 12
+numero horario = 17
 
 numero erro = 0
 numero p = 0
@@ -9,7 +9,7 @@ numero lastErro = 0
 numero PID = 0
 numero correcaoE = 0
 numero correcaoD = 0
-numero velocidade = 200
+numero velocidade = 150
 
 numero reajuste = 0.6
 
@@ -89,6 +89,27 @@ tarefa alinhandoReto {
     alinhamento = negativo((direcao() - 270))
   }
   rotacionar(50, arredondar(alinhamento))
+}
+
+tarefa alinhandoRetoParaPreto {
+  se ((0 < direcao()) e (direcao() < 20)) entao {
+    alinhamento = negativo(direcao())
+  } senao se ((340 < direcao()) e (direcao() < 359)) entao {
+    alinhamento = 360 - direcao()
+  } senao se ((73 < direcao()) e (direcao() <= 90)) entao {
+    alinhamento = 90 - direcao()
+  } senao se ((90 <= direcao()) e (direcao() < 107)) entao {
+    alinhamento = negativo((direcao() - 90))
+  } senao se ((163 < direcao()) e (direcao() <= 180)) entao {
+    alinhamento = 180 - direcao()
+  } senao se ((180 <= direcao()) e (direcao() < 207)) entao {
+    alinhamento = negativo((direcao() - 180))
+  } senao se ((253 < direcao()) e (direcao() <= 270)) entao {
+    alinhamento = 270 - direcao()
+  } senao se ((270 <= direcao()) e (direcao() < 297)) entao {
+    alinhamento = negativo((direcao() - 270))
+  }
+  rotacionar(100, arredondar(alinhamento))
 }
 
 tarefa alinhandoEsquerda {
@@ -2343,7 +2364,7 @@ inicio
       se (((cor(1) == "VERDE") ou (cor(2) == "VERDE")) ou ((cor(3) == "VERDE") ou (cor(4) == "VERDE"))) entao {
         paradinha()
         se (((cor(1) == "VERDE") ou (cor(2) == "VERDE")) e ((cor(3) == "VERDE") ou (cor(4) == "VERDE"))) entao {
-          rotacionar(200, 180)
+          rotacionar(1000, 180)
           trasrotacao(200, 4)
         } senao se ((cor(1) == "VERDE") ou (cor(2) == "VERDE") e ((cor(3) != "VERDE") e (cor(4) != "VERDE"))) entao {
           frenterotacao(200, 14)
@@ -2365,9 +2386,10 @@ inicio
       } senao se ((cor(1) == "PRETO") ou (cor(4) == "PRETO")) entao {
         paradinha()
         se ((cor(1) == "PRETO") e (cor(4) == "PRETO")) entao {
-          frenterotacao(200, 3)
+          frenterotacao(200, 4)
         } senao se ((cor(1) == "PRETO") e (cor(4) != "PRETO")) entao {
-          frenterotacao(200, 3)
+          frenterotacao(200, 4)
+          alinhandoRetoParaPreto()
           rotacionar(500, 4)
 
           enquanto (verdadeiro) farei {
@@ -2390,7 +2412,8 @@ inicio
             }
           }
         } senao se ((cor(1) != "PRETO") e (cor(4) == "PRETO")) entao {
-          frenterotacao(200, 3)
+          frenterotacao(200, 4)
+          alinhandoRetoParaPreto()
           rotacionar(500, 4)
 
           enquanto (verdadeiro) farei {
@@ -2455,7 +2478,7 @@ inicio
           alinhandoReto()
           saiuDaSala = verdadeiro
         } senao se ((cor(2) == "VERMELHO") e (cor(3) == "VERMELHO") e (saiuDaSala) ) entao {
-          frenterotacao(250, 5)
+          frenterotacao(250, 7)
           parei()
         } senao {
           se ((15 < inclinacao()) e (inclinacao() < 345)) entao {
