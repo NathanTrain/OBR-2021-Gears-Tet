@@ -1,3 +1,5 @@
+numero horario = 12
+
 numero erro = 0
 numero p = 0
 numero i = 0
@@ -11,7 +13,7 @@ numero velocidade = 200
 
 numero reajuste = 0.6
 
-numero velocidadeBranco = 125
+numero velocidadeBranco = 100
 
 numero alinhamento = 0
 
@@ -33,10 +35,7 @@ booleano resgateDireitaCima = falso
 
 booleano saiuDaSala = falso
 
-numero horario = 12
-
 tarefa segueLinha {
-
   se (((7 < horario) e (horario < 7.75)) ou ((16.25 < horario) e (horario < 17.25)) ) entao {
     se ( (75 < direcao()) e (direcao() < 105) ) entao {
         erro = (((luz(2) - luz(3)) - 25) * reajuste)
@@ -49,7 +48,6 @@ tarefa segueLinha {
     erro = ((luz(2) - luz(3)) * reajuste)
   }
 
-  # DEFININDO VALORES DO PID
   p = erro * 50
   integral = integral + erro
   i = integral * 0.0001
@@ -58,7 +56,6 @@ tarefa segueLinha {
 
   PID = p + i + d
 
-  # CORRIGINDO A MOVIMENTAÇÃO
   correcaoE = (velocidade + PID)
   correcaoD = (velocidade - PID)
 
@@ -94,17 +91,6 @@ tarefa alinhandoReto {
   rotacionar(50, arredondar(alinhamento))
 }
 
-tarefa paradinha {
-  parar()
-  esperar(250)
-}
-
-tarefa parei {
-  enquanto (verdadeiro) farei {
-    parar()
-  }
-}
-
 tarefa alinhandoEsquerda {
   enquanto (cor(2) != "PRETO") farei {
     esquerda(750)
@@ -122,6 +108,17 @@ tarefa alinhandoDireita {
   }
 }
 
+tarefa paradinha {
+  parar()
+  esperar(250)
+}
+
+tarefa parei {
+  enquanto (verdadeiro) farei {
+    parar()
+  }
+}
+
 tarefa atuadorEntregaVitima {
   baixar(200)
   velocidadeatuador(200)
@@ -134,7 +131,6 @@ tarefa atuadorEntregaVitima {
 
 tarefa encontraPegaVitima {
   velocidadeatuador(100)
-  # TODO => verificar partes iguais de código e mudar para outras tarefas
 
   se ((saidaDireita) e (resgateFrente)) entao {
     baixar(1200)
@@ -207,7 +203,11 @@ tarefa encontraPegaVitima {
       # já está do outro lado da sala
       # retorna e segue para entregar vitima
       enquanto (toque(1) == falso) farei {
-        tras(125)
+        se (temvitima()) entao {
+          tras(250)
+        } senao {
+          tras(125)
+        }
       }
       paradinha()
       frenterotacao(250, 15)
@@ -225,7 +225,7 @@ tarefa encontraPegaVitima {
         rotacionar(500, 45)
 
         alinhandoReto()
-        trasrotacao(250, 10)
+        trasrotacao(250, 15)
       }
       baixar(600)
     }
@@ -2221,22 +2221,9 @@ tarefa verificaSala {
     }
     frente(125)
   }
-
-  # verificações:
-    # saída na direita
-      # resgate na frente
-      # resgate direita cima
-    # resgate direita baixo
-      # saída na esquerda
-      # saída na frente
-    # senao
-      # resgate na frente E saída na frente
-      # resgate direita cima E saída na esquerda
-
   paradinha()
 
   zerartemporizador()
-
   se (contSaida > contResgate) entao {
     saidaDireita = verdadeiro
     levantar(700)
@@ -2274,7 +2261,6 @@ tarefa verificaSala {
         frente(125)
       }
     }
-
   } senao {
     levantar(700)
     enquanto (verdadeiro) farei {
@@ -2299,74 +2285,188 @@ tarefa verificaSala {
       }
     }
   }
-
   paradinha()
-
 }
 
 inicio
+  trasrotacao(250, 5)
+  se ((horario < 8) ou (16 < horario)) entao {
+    ajustarcor(45)
+  } senao se (((8 <= horario) e (horario < 11)) ou ((13 < horario) e (horario <= 16))) entao  {
+    ajustarcor(35)
+  } senao {
+    ajustarcor(30)
+  }
 
   velocidadeatuador(200)
   levantar(500)
   girarbaixo(500)
 
   enquanto (verdadeiro) farei {
-    se ((inclinacao() < 345) e ((ultra(2) < 40) e (ultra(3) < 40))) entao {
-      # PASSANDO PELA RAMPA
+    se ((ultra(1) <= 10) e (cor(5) != "BRANCO")) entao {
       paradinha()
-      zerartemporizador()
-
-      velocidadeatuador(500)
-      baixar(100)
-      velocidadeatuador(100)
-
-      velocidadeBranco = 250
-      enquanto (inclinacao() != 0) farei {
-        segueLinhaComBranco()
-      }
-      velocidadeBranco = 125
-
-      # NA SALA DE RESGATE
-      paradinha()
-      para contagem de 1 ate 3 passo 1 farei {
-        alinhandoReto()
-        paradinha()
-      }
-      contagem = 1
-
-      frenterotacao(200, 20)
-      trasrotacao(200, 20)
-
+      alinhandoReto()
       paradinha()
 
-      enquanto (angulogiroatuador() > 15) farei {
-        girarcima(1)
+      rotacionar(500, 90)
+      enquanto (ultra(3) < 20) farei {
+        frente(200)
       }
-      enquanto (angulogiroatuador() < 15) farei {
-        girarcima(1)
+      frenterotacao(200, 10)
+      rotacionar(500, negativo(90))
+
+      enquanto (ultra(3) > 20) farei {
+        frente(200)
       }
-      baixar(750)
+      enquanto (ultra(3) < 20) farei {
+        frente(200)
+      }
+      frenterotacao(200, 12)
+      rotacionar(500, negativo(90))
 
-      # ANALISANDO A SALA
-      verificaSala()
+      enquanto (ultra(3) > 50) farei {
+        frente(200)
+      }
+      frenterotacao(200, 6.5)
+      rotacionar(500, 45)
 
-      # BUSCANDO VÍTIMA
-      encontraPegaVitima()
-
-      frenterotacao(125, 2.5)
+      enquanto (cor(4) != "PRETO") farei {
+        direita(500)
+      }
+      alinhandoEsquerda()
       alinhandoReto()
 
-      saiuDaSala = verdadeiro
-
+      enquanto (toque(1) == falso) farei {
+        tras(50)
+      }
     } senao {
-      se ((15 < inclinacao()) e (inclinacao() < 345)) entao {
-        segueLinhaComBranco()
-      } senao se ((((0 <= direcao()) e (direcao() < 7)) ou ((353 < direcao()) e (direcao() <= 360))) ou ((83 < direcao()) e (direcao() < 97)) ou ((173 < direcao()) e (direcao() < 187)) ou ((263 < direcao()) e (direcao() < 277))) entao {
-        segueLinhaComBranco()
+      se (((cor(1) == "VERDE") ou (cor(2) == "VERDE")) ou ((cor(3) == "VERDE") ou (cor(4) == "VERDE"))) entao {
+        paradinha()
+        se (((cor(1) == "VERDE") ou (cor(2) == "VERDE")) e ((cor(3) == "VERDE") ou (cor(4) == "VERDE"))) entao {
+          rotacionar(200, 180)
+          trasrotacao(200, 4)
+        } senao se ((cor(1) == "VERDE") ou (cor(2) == "VERDE") e ((cor(3) != "VERDE") e (cor(4) != "VERDE"))) entao {
+          frenterotacao(200, 14)
+          rotacionar(500, 20)
+          enquanto (cor(3) != "PRETO") farei {
+            direita(750)
+          }
+          trasrotacao(200, 4)
+          alinhandoEsquerda()
+        } senao se ((cor(1) != "VERDE") e (cor(2) != "VERDE") e ((cor(3) == "VERDE") ou (cor(4) == "VERDE"))) entao {
+          frenterotacao(200, 14)
+          rotacionar(500, negativo(20))
+          enquanto (cor(2) != "PRETO") farei {
+            esquerda(750)
+          }
+          trasrotacao(200, 4)
+          alinhandoDireita()
+        }
+      } senao se ((cor(1) == "PRETO") ou (cor(4) == "PRETO")) entao {
+        paradinha()
+        se ((cor(1) == "PRETO") e (cor(4) == "PRETO")) entao {
+          frenterotacao(200, 3)
+        } senao se ((cor(1) == "PRETO") e (cor(4) != "PRETO")) entao {
+          frenterotacao(200, 3)
+          rotacionar(500, 4)
+
+          enquanto (verdadeiro) farei {
+            se ((cor(2) == "PRETO") ou (cor(3) == "PRETO")) entao {
+              rotacionar(500, negativo(4))
+              interromper()
+
+            } senao {
+              rotacionar(500, negativo(4))
+
+              frenterotacao(200, 8)
+              rotacionar(500, 90)
+              trasrotacao(200, 5)
+
+              enquanto (cor(1) != "PRETO") farei {
+                esquerda(750)
+              }
+              alinhandoDireita()
+              interromper()
+            }
+          }
+        } senao se ((cor(1) != "PRETO") e (cor(4) == "PRETO")) entao {
+          frenterotacao(200, 3)
+          rotacionar(500, 4)
+
+          enquanto (verdadeiro) farei {
+            se ((cor(2) == "PRETO") ou (cor(3) == "PRETO")) entao {
+              rotacionar(500, negativo(4))
+              interromper()
+
+            } senao {
+              rotacionar(500, negativo(4))
+
+              frenterotacao(200, 8)
+              rotacionar(500, negativo(90))
+              trasrotacao(200, 5)
+
+              enquanto (cor(4) != "PRETO") farei {
+                direita(750)
+              }
+              alinhandoEsquerda()
+              interromper()
+            }
+          }
+        }
       } senao {
-        segueLinha()
+        se (((340 < inclinacao()) e (inclinacao() < 350)) e ((ultra(2) < 40) e (ultra(3) < 40))) entao {
+          paradinha()
+          zerartemporizador()
+
+          velocidadeatuador(500)
+          baixar(100)
+          velocidadeatuador(100)
+
+          velocidadeBranco = 250
+          enquanto (inclinacao() != 0) farei {
+            segueLinhaComBranco()
+          }
+          velocidadeBranco = 125
+
+          paradinha()
+          para contagem de 1 ate 3 passo 1 farei {
+            alinhandoReto()
+            paradinha()
+          }
+          contagem = 1
+
+          frenterotacao(200, 20)
+          trasrotacao(200, 20)
+
+          paradinha()
+
+          enquanto (angulogiroatuador() > 15) farei {
+            girarcima(1)
+          }
+          enquanto (angulogiroatuador() < 15) farei {
+            girarcima(1)
+          }
+          baixar(750)
+
+          verificaSala()
+          encontraPegaVitima()
+
+          frenterotacao(125, 2.5)
+          alinhandoReto()
+          saiuDaSala = verdadeiro
+        } senao se ((cor(2) == "VERMELHO") e (cor(3) == "VERMELHO") e (saiuDaSala) ) entao {
+          frenterotacao(250, 5)
+          parei()
+        } senao {
+          se ((15 < inclinacao()) e (inclinacao() < 345)) entao {
+            segueLinhaComBranco()
+          } senao se ((((0 <= direcao()) e (direcao() < 7)) ou ((353 < direcao()) e (direcao() <= 360))) ou ((83 < direcao()) e (direcao() < 97)) ou ((173 < direcao()) e (direcao() < 187)) ou ((263 < direcao()) e (direcao() < 277))) entao {
+            segueLinhaComBranco()
+          } senao {
+            segueLinha()
+          }
+        }
       }
     }
-  }
-
+  }  
 fim

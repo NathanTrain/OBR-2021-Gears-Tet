@@ -71,24 +71,24 @@ tarefa segueLinhaComBranco {
 }
 
 tarefa alinhandoReto {
-  se (direcao() < 17) entao {
+  se ((0 < direcao()) e (direcao() < 45)) entao {
     alinhamento = negativo(direcao())
-  } senao se (345 < direcao()) entao {
+  } senao se ((315 < direcao()) e (direcao() < 359)) entao {
     alinhamento = 360 - direcao()
-  } senao se (73 < direcao()) entao {
+  } senao se ((45 < direcao()) e (direcao() <= 90)) entao {
     alinhamento = 90 - direcao()
-  } senao se (direcao() < 107) entao {
-    alinhamento = negativo(direcao() - 90)
-  } senao se (163 < direcao()) entao {
+  } senao se ((90 <= direcao()) e (direcao() < 135)) entao {
+    alinhamento = negativo((direcao() - 90))
+  } senao se ((135 < direcao()) e (direcao() <= 180)) entao {
     alinhamento = 180 - direcao()
-  } senao se (direcao() < 207) entao {
-    alinhamento = negativo(direcao() - 180)
-  } senao se (253 < direcao()) entao {
+  } senao se ((180 <= direcao()) e (direcao() < 225)) entao {
+    alinhamento = negativo((direcao() - 180))
+  } senao se ((225 < direcao()) e (direcao() <= 270)) entao {
     alinhamento = 270 - direcao()
-  } senao se (direcao() < 297) entao {
-    alinhamento = negativo(direcao() - 270)
+  } senao se ((270 <= direcao()) e (direcao() < 315)) entao {
+    alinhamento = negativo((direcao() - 270))
   }
-  rotacionar(100, alinhamento)
+  rotacionar(50, arredondar(alinhamento))
 }
 
 # AS TAREFAS alinhandoEsquerda E alinhandoDireita SÃO PARA QUANDO O ROBÔ
@@ -117,7 +117,6 @@ tarefa paradinha {
   esperar(250)
 }
 
-# tarefa para debug somente
 tarefa parei {
   enquanto (verdadeiro) farei {
     parar()
@@ -302,9 +301,8 @@ inicio
           #       -> segue linha normalmente
 
         se (((340 < inclinacao()) e (inclinacao() < 350)) e ((ultra(2) < 40) e (ultra(3) < 40))) entao {
-          enquanto (inclinacao() != 0) farei {
-            segueLinhaComBranco()
-          }
+          # importar(SalaDeResgate)
+        } senao se (((60 < corvermelha(2)) e (corvermelha(2) < 70)) e ((10 < corazul(2)) e (corazul(2) < 20))) entao {
           frenterotacao(250, 5)
           parei()
         } senao {
