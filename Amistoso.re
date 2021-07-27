@@ -1,4 +1,4 @@
-numero horario = 17
+numero horario = 12
 
 numero erro = 0
 numero p = 0
@@ -9,11 +9,11 @@ numero lastErro = 0
 numero PID = 0
 numero correcaoE = 0
 numero correcaoD = 0
-numero velocidade = 150
+numero velocidade = 250
 
 numero reajuste = 0.6
 
-numero velocidadeBranco = 100
+numero velocidadeBranco = 200
 
 numero alinhamento = 0
 
@@ -88,7 +88,7 @@ tarefa alinhandoReto {
   } senao se ((270 <= direcao()) e (direcao() < 315)) entao {
     alinhamento = negativo((direcao() - 270))
   }
-  rotacionar(50, arredondar(alinhamento))
+  rotacionar(150, arredondar(alinhamento))
 }
 
 tarefa alinhandoRetoParaPreto {
@@ -109,7 +109,7 @@ tarefa alinhandoRetoParaPreto {
   } senao se ((270 <= direcao()) e (direcao() < 297)) entao {
     alinhamento = negativo((direcao() - 270))
   }
-  rotacionar(100, arredondar(alinhamento))
+  rotacionar(150, arredondar(alinhamento))
 }
 
 tarefa alinhandoEsquerda {
@@ -2361,14 +2361,19 @@ inicio
         tras(50)
       }
     } senao {
-      se (((cor(1) == "VERDE") ou (cor(2) == "VERDE")) ou ((cor(3) == "VERDE") ou (cor(4) == "VERDE"))) entao {
+      se (((corverde(1) < 70 e corazul(1) < 20) ou (corverde(2) < 70 e corazul(2) < 20) ou (corverde(3) < 70 e corazul(3) < 20) ou (corverde(4) < 70 e corazul(4) < 20))) entao {
+        trasrotacao(500, 5)
+        zerartemporizador()
+        enquanto (cor(1) != "VERDE" e cor(4) != "VERDE" e temporizador() < 1000) farei {
+          segueLinha()
+        }
         paradinha()
         se (((cor(1) == "VERDE") ou (cor(2) == "VERDE")) e ((cor(3) == "VERDE") ou (cor(4) == "VERDE"))) entao {
           rotacionar(1000, 180)
           trasrotacao(200, 4)
         } senao se ((cor(1) == "VERDE") ou (cor(2) == "VERDE") e ((cor(3) != "VERDE") e (cor(4) != "VERDE"))) entao {
           frenterotacao(200, 14)
-          rotacionar(500, 20)
+          rotacionar(1000, 20)
           enquanto (cor(3) != "PRETO") farei {
             direita(750)
           }
@@ -2376,16 +2381,21 @@ inicio
           alinhandoEsquerda()
         } senao se ((cor(1) != "VERDE") e (cor(2) != "VERDE") e ((cor(3) == "VERDE") ou (cor(4) == "VERDE"))) entao {
           frenterotacao(200, 14)
-          rotacionar(500, negativo(20))
+          rotacionar(1000, negativo(20))
           enquanto (cor(2) != "PRETO") farei {
             esquerda(750)
           }
           trasrotacao(200, 4)
           alinhandoDireita()
         }
-      } senao se ((cor(1) == "PRETO") ou (cor(4) == "PRETO")) entao {
+      } senao se ((corverde(1) < 40) e (corverde(4) < 40)) entao {
+        trasrotacao(500, 5)
+        zerartemporizador()
+        enquanto (cor(1) != "PRETO" e cor(4) != "PRETO" e temporizador() < 1000) farei {
+          segueLinha()
+        }
         paradinha()
-        se ((cor(1) == "PRETO") e (cor(4) == "PRETO")) entao {
+        se ((cor(1) == "PRETO") e (cor(4) != "PRETO")) entao {
           frenterotacao(200, 4)
         } senao se ((cor(1) == "PRETO") e (cor(4) != "PRETO")) entao {
           frenterotacao(200, 4)
@@ -2401,8 +2411,8 @@ inicio
               rotacionar(500, negativo(4))
 
               frenterotacao(200, 8)
-              rotacionar(500, 90)
-              trasrotacao(200, 5)
+              rotacionar(1000, 90)
+              trasrotacao(200, 7)
 
               enquanto (cor(1) != "PRETO") farei {
                 esquerda(750)
@@ -2425,8 +2435,8 @@ inicio
               rotacionar(500, negativo(4))
 
               frenterotacao(200, 8)
-              rotacionar(500, negativo(90))
-              trasrotacao(200, 5)
+              rotacionar(1000, negativo(90))
+              trasrotacao(200, 7)
 
               enquanto (cor(4) != "PRETO") farei {
                 direita(750)
