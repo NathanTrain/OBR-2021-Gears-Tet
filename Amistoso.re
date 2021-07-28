@@ -91,7 +91,7 @@ tarefa alinhandoReto {
   rotacionar(150, arredondar(alinhamento))
 }
 
-tarefa alinhandoRetoParaPreto {
+tarefa alinhaRetoParaPreto {
   se ((0 < direcao()) e (direcao() < 20)) entao {
     alinhamento = negativo(direcao())
   } senao se ((340 < direcao()) e (direcao() < 359)) entao {
