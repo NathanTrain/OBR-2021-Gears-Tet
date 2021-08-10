@@ -1,4 +1,4 @@
-numero velocidadeFrenteSeguidor = 150
+numero velocidadeFrenteSeguidor = 175
 
 booleano viraEsquerda = falso
 booleano viraDireita = falso
@@ -24,7 +24,7 @@ booleano resgateDireitaCima = falso
 
 booleano resgateConcluido = falso
 
-numero horario = 14.25
+numero horario = 12
 
 tarefa segueLinha {
   se (cor(2) == "PRETO" e cor(3) == "PRETO") entao {
@@ -61,7 +61,7 @@ tarefa verificaCurva {
   se (cor(1) != "VERDE" e cor(2) != "VERDE" e cor(3) != "VERDE" e cor(4) != "VERDE") entao {
     se (cor(1) != "PRETO" e cor(4) != "PRETO") entao {
       enquanto (cor(1) != "PRETO" e cor(4) != "PRETO") farei {
-        tras(150)
+        tras(50)
       }
       parar()
     }
@@ -207,6 +207,10 @@ tarefa verificaSala {
 tarefa encontraPegaVitima {
   velocidadeatuador(100)
 
+  # TODO => adicionar retorno após encontrar vitima (trasrotacao(300, 3))
+
+  # TODO => corrigir resgate => verificar todos os movimentos e ações
+
   se ((saidaDireita) e (resgateFrente)) entao {
     baixar(1200)
 
@@ -243,7 +247,6 @@ tarefa encontraPegaVitima {
         levantar(400)
 
         rotacionar(500, 90)
-        alinhandoReto()
 
         frenterotacao(250, 15)
         trasrotacao(250, 15)
@@ -255,7 +258,6 @@ tarefa encontraPegaVitima {
       } senao {
         # vira 90°
         rotacionar(500, 90)
-        alinhandoReto()
       }
 
       # segue até a parede
@@ -272,12 +274,11 @@ tarefa encontraPegaVitima {
       }
 
       levantar(400)
-
       paradinha()
+      esperar(500)
 
       # já está do outro lado da sala
       # retorna e segue para entregar vitima
-      esperar(250)
       enquanto (toque(1) == falso) farei {
         se (temvitima()) entao {
           tras(175)
@@ -296,9 +297,8 @@ tarefa encontraPegaVitima {
         enquanto (corvermelha(5) > 2) farei {
           frente(250)
         }
-        rotacionar(500, negativo(45))
+        paradinha()
         atuadorEntregaVitima()
-        rotacionar(500, 45)
 
         alinhandoReto()
         trasrotacao(250, 15)
@@ -339,9 +339,8 @@ tarefa encontraPegaVitima {
       }
       parar()
 
-      rotacionar(500, negativo(45))
+      paradinha()
       atuadorEntregaVitima()
-      rotacionar(500, 45)
       alinhandoReto()
 
       enquanto (toque(1) == falso) farei {
@@ -390,7 +389,6 @@ tarefa encontraPegaVitima {
         levantar(400)
 
         rotacionar(500, 90)
-        alinhandoReto()
 
         frenterotacao(250, 15)
         trasrotacao(250, 15)
@@ -402,7 +400,6 @@ tarefa encontraPegaVitima {
       } senao {
         # vira 90°
         rotacionar(500, 90)
-        alinhandoReto()
       }
 
       # segue até a parede
@@ -419,12 +416,11 @@ tarefa encontraPegaVitima {
       }
 
       levantar(400)
-
       paradinha()
+      esperar(500)
 
       # já está do outro lado da sala
       # retorna e segue para entregar vitima
-      esperar(250)
       se (temvitima() == falso) entao {
         enquanto (toque(1) == falso) farei {
           tras(300)
@@ -443,9 +439,8 @@ tarefa encontraPegaVitima {
           frente(250)
         }
         tempoDeRetorno = temporizador()
-        rotacionar(500, 45)
+        paradinha()
         atuadorEntregaVitima()
-        rotacionar(500, negativo(45))
         alinhandoReto()
 
         tras(250)
@@ -506,9 +501,8 @@ tarefa encontraPegaVitima {
       parar()
       alinhandoReto()
 
-      rotacionar(500, negativo(45))
+      paradinha()
       atuadorEntregaVitima()
-      rotacionar(500, 45)
       alinhandoReto()
 
       enquanto (toque(1) == falso) farei {
@@ -567,7 +561,6 @@ tarefa encontraPegaVitima {
         levantar(400)
 
         rotacionar(500, 90)
-        alinhandoReto()
 
         frenterotacao(250, 15)
         trasrotacao(250, 15)
@@ -592,7 +585,6 @@ tarefa encontraPegaVitima {
       } senao se (temArea) entao {
         # vira 90°
         rotacionar(500, 90)
-        alinhandoReto()
 
         # segue até a area
         zerartemporizador()
@@ -603,7 +595,6 @@ tarefa encontraPegaVitima {
       } senao {
         # vira 90°
         rotacionar(500, 90)
-        alinhandoReto()
 
         # segue até a parede
         zerartemporizador()
@@ -620,15 +611,14 @@ tarefa encontraPegaVitima {
 
       # se a área estiver na frente dele, entrega vitima
       se (temArea e temvitima()) entao {
-        rotacionar(500, 45)
 
         enquanto (corvermelha(5) > 2) farei {
           frente(250)
         }
         paradinha()
 
+        paradinha()
         atuadorEntregaVitima()
-        rotacionar(500, negativo(45))
 
         alinhandoReto()
         temArea = falso
@@ -646,9 +636,8 @@ tarefa encontraPegaVitima {
         }
         tempoDeRetorno = temporizador()
 
-        rotacionar(500, negativo(45))
+        paradinha()
         atuadorEntregaVitima()
-        rotacionar(500, 45)
         alinhandoReto()
 
         tras(250)
@@ -704,9 +693,8 @@ tarefa encontraPegaVitima {
       }
       parar()
 
-      rotacionar(500, negativo(45))
+      paradinha()
       atuadorEntregaVitima()
-      rotacionar(500, 45)
       alinhandoReto()
 
       enquanto (ultra(2) < 300) farei {
@@ -758,7 +746,6 @@ tarefa encontraPegaVitima {
         levantar(400)
 
         rotacionar(500, 90)
-        alinhandoReto()
 
         frenterotacao(250, 15)
         trasrotacao(250, 15)
@@ -783,7 +770,6 @@ tarefa encontraPegaVitima {
       } senao se (temArea) entao {
         # vira 90°
         rotacionar(500, 90)
-        alinhandoReto()
 
         # segue até a area
         zerartemporizador()
@@ -794,7 +780,6 @@ tarefa encontraPegaVitima {
       } senao {
         # vira 90°
         rotacionar(500, 90)
-        alinhandoReto()
 
         # segue até a parede
         zerartemporizador()
@@ -811,15 +796,12 @@ tarefa encontraPegaVitima {
 
       # se a área estiver na frente dele, entrega vitima
       se (temArea e temvitima()) entao {
-        rotacionar(250, negativo(45))
 
         enquanto (corvermelha(5) > 2) farei {
           frente(250)
         }
         paradinha()
-
         atuadorEntregaVitima()
-        rotacionar(500, 45)
         alinhandoReto()
       }
 
@@ -834,9 +816,8 @@ tarefa encontraPegaVitima {
           frente(250)
         }
         tempoDeRetorno = temporizador()
-        rotacionar(500, 45)
+        paradinha()
         atuadorEntregaVitima()
-        rotacionar(500, negativo(45))
         alinhandoReto()
 
         tras(250)
@@ -916,9 +897,8 @@ tarefa encontraPegaVitima {
       tempoDeRetorno = temporizador()
       alinhandoReto()
 
-      rotacionar(500, negativo(45))
+      paradinha()
       atuadorEntregaVitima()
-      rotacionar(500, 45)
       alinhandoReto()
 
       tras(250)
@@ -976,7 +956,6 @@ tarefa encontraPegaVitima {
         levantar(400)
 
         rotacionar(500, 90)
-        alinhandoReto()
 
         frenterotacao(250, 15)
         trasrotacao(250, 15)
@@ -1000,7 +979,6 @@ tarefa encontraPegaVitima {
       } senao se (temArea) entao {
         # vira 90°
         rotacionar(500, 90)
-        alinhandoReto()
 
         # segue até a area
         zerartemporizador()
@@ -1011,7 +989,6 @@ tarefa encontraPegaVitima {
       } senao {
         # vira 90°
         rotacionar(500, 90)
-        alinhandoReto()
 
         # segue até a parede
         enquanto (ultra(1) > 35) farei {
@@ -1033,7 +1010,6 @@ tarefa encontraPegaVitima {
           frente(250)
         }
         paradinha()
-
         atuadorEntregaVitima()
         rotacionar(250, negativo(45))
         alinhandoReto()
@@ -1062,9 +1038,8 @@ tarefa encontraPegaVitima {
         }
         tempoDeRetorno = temporizador()
 
-        rotacionar(500, negativo(45))
+        paradinha()
         atuadorEntregaVitima()
-        rotacionar(500, 45)
         alinhandoReto()
 
         tras(250)
@@ -1181,20 +1156,18 @@ tarefa encontraPegaVitima {
 
       frenterotacao(250, 2)
       levantar(400)
+      esperar(500)
       # já está do outro lado da sala
 
       # se a área estiver na frente dele, entrega vitima
       
       se (temArea e temvitima()) entao {
-        rotacionar(500, negativo(45))
 
         enquanto (corvermelha(5) > 2) farei {
           frente(250)
         }
         paradinha()
-
         atuadorEntregaVitima()
-        rotacionar(500, 45)
         alinhandoReto()
         temArea = falso
       }
@@ -1219,9 +1192,8 @@ tarefa encontraPegaVitima {
         }
         tempoDeRetorno = temporizador()
 
-        rotacionar(500, 45)
+        paradinha()
         atuadorEntregaVitima()
-        rotacionar(500, negativo(45))
         alinhandoReto()
 
         tras(250)
@@ -1254,9 +1226,8 @@ tarefa encontraPegaVitima {
         frente(250)
       }
 
-      rotacionar(500, negativo(45))
+        paradinha()
       atuadorEntregaVitima()
-      rotacionar(500, 45)
       alinhandoReto()
 
       trasrotacao(500, 35)
@@ -1328,7 +1299,6 @@ tarefa encontraPegaVitima {
         levantar(400)
 
         rotacionar(500, 90)
-        alinhandoReto()
 
         frenterotacao(250, 15)
         trasrotacao(250, 15)
@@ -1340,7 +1310,6 @@ tarefa encontraPegaVitima {
       } senao {
         # vira 90°
         rotacionar(500, 90)
-        alinhandoReto()
       }
 
       se (ultra(1) > 350) entao {
@@ -1374,9 +1343,8 @@ tarefa encontraPegaVitima {
         enquanto (corvermelha(5) > 2) farei {
           frente(250)
         }
-        rotacionar(500, negativo(45))
+        paradinha()
         atuadorEntregaVitima()
-        rotacionar(500, 45)
 
         alinhandoReto()
         trasrotacao(250, 10)
@@ -1486,6 +1454,7 @@ tarefa encontraPegaVitima {
 
       frenterotacao(250, 2)
       levantar(400)
+      esperar(500)
       # já está do outro lado da sala
 
       # se a área estiver na frente dele, entrega vitima
@@ -1496,7 +1465,6 @@ tarefa encontraPegaVitima {
           frente(250)
         }
         paradinha()
-
         atuadorEntregaVitima()
         rotacionar(250, 45)
         alinhandoReto()
@@ -1514,9 +1482,8 @@ tarefa encontraPegaVitima {
         }
         tempoDeRetorno = temporizador()
 
-        rotacionar(500, 45)
+        paradinha()
         atuadorEntregaVitima()
-        rotacionar(500, negativo(45))
         alinhandoReto()
 
         tras(250)
@@ -1561,9 +1528,8 @@ tarefa encontraPegaVitima {
         frente(250)
       }
 
-      rotacionar(500, negativo(45))
+      paradinha()
       atuadorEntregaVitima()
-      rotacionar(500, 45)
       alinhandoReto()
 
       trasrotacao(500, 35)
@@ -1571,7 +1537,6 @@ tarefa encontraPegaVitima {
     }
 
     # sai pela área verde
-
     levantar(600)
     girarbaixo(750)
 
@@ -1675,6 +1640,8 @@ inicio
           tras(150)
         }
       }
+      alinhandoReto()
+      paradinha()
 
     } senao {
       se (((cor(1) == "VERDE") ou (cor(2) == "VERDE")) ou ((cor(3) == "VERDE") ou (cor(4) == "VERDE"))) entao {
@@ -1687,7 +1654,7 @@ inicio
         se (travessa) entao {
           rotacionar(500, 180)
         } senao se (viraDireita) entao {
-          rotacionar(500, 45)
+          rotacionar(500, 30)
           trasrotacao(300, 5)
 
           enquanto (cor(3) != "PRETO") farei {
@@ -1719,10 +1686,10 @@ inicio
 
           # verifica onde está
           verificaCurva()
-          frenterotacao(300, 7)
+          frenterotacao(300, 5)
 
           se (travessa) entao {
-            frenterotacao(300, 4)
+            frenterotacao(300, 5)
 
           } senao se (viraDireita) entao {
 
