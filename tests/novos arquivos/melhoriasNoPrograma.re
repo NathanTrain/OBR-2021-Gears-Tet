@@ -119,8 +119,8 @@ tarefa atuadorEntregaVitima {
   levantar(300)
 }
 
-# TODO => CONFERIR VERIFICA SALA
-# TODO => USAR TEMPO < 60*1000*3.5 (3 MIN E MEIO) PARA, SE FOR MENOR, FAZER VERIFICAÇÃO VERTICAL (OU TIRAR ELA INTEIRAMENTE)
+
+# tarefas do resgate
 
 tarefa verificaSala {
   zerartemporizador()
@@ -661,6 +661,8 @@ tarefa saidaDoResgate {
 }
 
 
+# inicio da programação
+
 inicio
 # CALIBRAÇÃO POR HORÁRIO
   se ((horario < 8) ou (16 < horario)) entao {
@@ -762,22 +764,61 @@ inicio
           verificaCurva()
           frenterotacao(300, 5)
 
+          angulo = 0
           se (travessa) entao {
             frenterotacao(300, 5)
 
           } senao se (viraDireita) entao {
-
-            enquanto (cor(3) != "PRETO") farei {
+            enquanto ((cor(3) != "PRETO") e (angulo < 90)) farei {
               direita(1000)
+              esperar(30)
+              angulo = angulo + 1
+            }
+
+            se (cor(3) != "PRETO" e angulo >= 90) entao {
+              trasrotacao(300, 7)
+
+              enquanto (cor(2) != "PRETO") farei {
+                esquerda(1000)
+              }
+
+              zerartemporizador()
+              enquanto (temporizador() <= 1250) farei {
+                segueLinha()
+              }
+
+              frenterotacao(300, 9)
+              alinhandoReto()
+              trasrotacao(300, 9)
             }
 
           } senao se (viraEsquerda) entao {
-
-            enquanto (cor(2) != "PRETO") farei {
+            enquanto ((cor(2) != "PRETO") e (angulo < 90)) farei {
               esquerda(1000)
+              esperar(30)
+              angulo = angulo + 1
+            }
+
+            se (cor(3) != "PRETO" e angulo >= 90) entao {
+              trasrotacao(300, 7)
+
+              enquanto (cor(3) != "PRETO") farei {
+                direita(1000)
+              }
+
+              zerartemporizador()
+              enquanto (temporizador() <= 1250) farei {
+                segueLinha()
+              }
+
+              frenterotacao(300, 9)
+              alinhandoReto()
+              trasrotacao(300, 9)
             }
 
           }
+
+          angulo = 5
           viraEsquerda = falso
           viraDireita = falso
           travessa = falso
