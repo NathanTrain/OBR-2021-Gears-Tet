@@ -30,7 +30,7 @@ numero angulo = 5
 
 booleano resgateConcluido = falso
 
-numero horario = 14.25
+numero horario = 14.75
 
 tarefa segueLinha {
   se (cor(2) == "PRETO" e cor(3) == "PRETO") entao {
@@ -91,23 +91,23 @@ tarefa verificaCurva {
 tarefa alinhandoReto {
   para contagemPara de 1 ate 2 passo 1 farei {
     se ((0 < direcao()) e (direcao() < 45)) entao {
-      alinhamento = negativo(direcao())
+      alinhamento = negativo(modulo(direcao()))
     } senao se ((315 < direcao()) e (direcao() < 359)) entao {
-      alinhamento = 360 - direcao()
+      alinhamento = modulo(360 - direcao())
     } senao se ((45 < direcao()) e (direcao() <= 90)) entao {
-      alinhamento = 90 - direcao()
+      alinhamento = modulo(90 - direcao())
     } senao se ((90 <= direcao()) e (direcao() < 135)) entao {
-      alinhamento = negativo((direcao() - 90))
+      alinhamento = negativo(modulo(direcao() - 90))
     } senao se ((135 < direcao()) e (direcao() <= 180)) entao {
-      alinhamento = 180 - direcao()
+      alinhamento = modulo(180 - direcao())
     } senao se ((180 <= direcao()) e (direcao() < 225)) entao {
-      alinhamento = negativo((direcao() - 180))
+      alinhamento = negativo(modulo(direcao() - 180))
     } senao se ((225 < direcao()) e (direcao() <= 270)) entao {
-      alinhamento = 270 - direcao()
+      alinhamento = modulo(270 - direcao())
     } senao se ((270 <= direcao()) e (direcao() < 315)) entao {
-      alinhamento = negativo((direcao() - 270))
+      alinhamento = negativo(modulo(direcao() - 270))
     }
-    rotacionar(250, arredondar(alinhamento))
+    rotacionar(150, arredondar(alinhamento))
   }
 }
 
@@ -389,10 +389,9 @@ tarefa retornoSemVitimaVertical {
 }
 
 tarefa entregaVitimaVertical {
-  alinhandoReto()
-
   se (resgateDireitaCima e temArea == falso) entao {
     rotacionar(500, negativo(90))
+    alinhandoReto()
 
     zerartemporizador()
     enquanto (corvermelha(5) > 2) farei {
@@ -420,6 +419,7 @@ tarefa entregaVitimaVertical {
 
   } senao se (resgateDireitaBaixo e temArea == falso) entao {
     rotacionar(500, 90)
+    alinhandoReto()
 
     zerartemporizador()
     enquanto (corvermelha(5) > 2) farei {
@@ -581,13 +581,12 @@ tarefa verificacaoVertical {
 tarefa encontraPegaVitima {
   velocidadeatuador(100)
   girarcima(100)
-  baixar(250)
+  baixar(350)
   alinhandoReto()
-
-  # TODO => refazer resgate
 
   se (resgateDireitaCima) entao {
     resgataBolinhaEntrada()
+    baixar(250)
     verificacaoVertical()
 
   } senao se (resgateDireitaBaixo) entao {
@@ -597,9 +596,11 @@ tarefa encontraPegaVitima {
     }
     parar()
     frenterotacao(300, 10)
+    baixar(250)
     verificacaoVertical()
 
   } senao se (resgateFrente) entao {
+    baixar(250)
     verificacaoVertical()
   }
 }
@@ -729,6 +730,13 @@ inicio
 
         se (travessa) entao {
           rotacionar(500, 180)
+          enquanto (cor(1) != "PRETO") farei {
+            esquerda(1000)
+          }
+          enquanto (cor(3) != "PRETO") farei {
+            direita(1000)
+          }
+          parar()
         } senao se (viraDireita) entao {
           rotacionar(500, 30)
           trasrotacao(300, 5)
@@ -850,7 +858,7 @@ inicio
             resgateConcluido = verdadeiro
 
             velocidadeFrenteSeguidor = 150
-          } senao se (((60 < corvermelha(2)) e (corvermelha(2) < 70)) e ((10 < corazul(2)) e (corazul(2) < 20)) e resgateConcluido) entao {
+          } senao se ((corvermelha(2) > 60) e (corazul(2) > 10) e resgateConcluido e cor(2) == "VERMELHO") entao {
             frenterotacao(250, 5)
             parei()
           } senao {
