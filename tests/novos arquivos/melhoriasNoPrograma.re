@@ -30,7 +30,7 @@ numero angulo = 5
 
 booleano resgateConcluido = falso
 
-numero horario = 17
+numero horario = 12
 
 tarefa segueLinha {
   se (cor(2) == "PRETO" e cor(3) == "PRETO") entao {
@@ -765,20 +765,22 @@ inicio
 
           # verifica onde está
           verificaCurva()
-          frenterotacao(300, 5)
+          frenterotacao(300, 6)
 
           angulo = 0
           se (travessa) entao {
             frenterotacao(300, 5)
 
           } senao se (viraDireita) entao {
-            enquanto ((cor(3) != "PRETO") e (angulo < 90)) farei {
+            enquanto ((cor(3) != "PRETO") e (angulo < 180)) farei {
               direita(1000)
               esperar(30)
               angulo = angulo + 1
             }
 
-            se (cor(3) != "PRETO" e angulo >= 90) entao {
+            se (cor(3) != "PRETO" e angulo >= 180) entao {
+              rotacionar(500, negativo(90))
+              alinhandoReto()
               trasrotacao(300, 7)
 
               enquanto (cor(2) != "PRETO") farei {
@@ -796,13 +798,15 @@ inicio
             }
 
           } senao se (viraEsquerda) entao {
-            enquanto ((cor(2) != "PRETO") e (angulo < 90)) farei {
+            enquanto ((cor(2) != "PRETO") e (angulo < 180)) farei {
               esquerda(1000)
               esperar(30)
               angulo = angulo + 1
             }
 
-            se (cor(3) != "PRETO" e angulo >= 90) entao {
+            se (cor(2) != "PRETO" e angulo >= 180) entao {
+              rotacionar(500, 90)
+              alinhandoReto()
               trasrotacao(300, 7)
 
               enquanto (cor(3) != "PRETO") farei {
