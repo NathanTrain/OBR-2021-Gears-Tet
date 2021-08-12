@@ -30,7 +30,7 @@ numero angulo = 5
 
 booleano resgateConcluido = falso
 
-numero horario = 14.75
+numero horario = 17
 
 tarefa segueLinha {
   se (cor(2) == "PRETO" e cor(3) == "PRETO") entao {
@@ -688,34 +688,29 @@ inicio
 
       trasrotacao(300, 14)
       rotacionar(500, 30)
+
+      frente(300)
+      esperar(1000)
+
+      rotacionar(500, negativo(30))
+      alinhandoReto()
       enquanto (ultra(3) > 40) farei {
         frente(300)
       }
-      enquanto (ultra(3) < 40 e cor(3) != "PRETO" e cor(4) != "PRETO") farei {
+      enquanto (ultra(3) < 40) farei {
         frente(300)
       }
-      paradinha()
-      se (cor(1) == "PRETO" ou cor(2) == "PRETO" ou cor(3) == "PRETO" ou cor(4) == "PRETO") entao {
-        frenterotacao(300, 15)
-        rotacionar(500, 60)
-        alinhandoReto()
-        enquanto (toque(1) == falso) farei {
-          tras(150)
-        }
-
-      } senao {
-        rotacionar(500, negativo(60))
-        enquanto (ultra(3) > 40) farei {
-          frente(300)
-        }
-        enquanto (ultra(3) < 40) farei {
-          frente(300)
-        }
-        frenterotacao(300, 16)
-        rotacionar(500, 30)
-        enquanto (toque(1) == falso) farei {
-          tras(150)
-        }
+      rotacionar(500, negativo(30))
+      enquanto (ultra(3) > 40) farei {
+        frente(300)
+      }
+      enquanto (ultra(3) < 40) farei {
+        frente(300)
+      }
+      frenterotacao(300, 16)
+      rotacionar(500, 30)
+      enquanto (toque(1) == falso) farei {
+        tras(150)
       }
       alinhandoReto()
       paradinha()
