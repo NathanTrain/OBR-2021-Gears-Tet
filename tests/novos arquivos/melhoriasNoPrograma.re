@@ -1,11 +1,11 @@
 numero velocidadeFrenteSeguidor = 175
 
+# variáveis para confirmação da curva
 booleano viraEsquerda = falso
 booleano viraDireita = falso
 booleano travessa = falso
 
 numero alinhamento = 0
-
 numero contagemPara = 1
 
 numero contResgate = 0
@@ -30,7 +30,7 @@ numero angulo = 5
 
 booleano resgateConcluido = falso
 
-numero horario = 12
+numero horario = 10
 
 tarefa segueLinha {
   se (cor(2) == "PRETO" e cor(3) == "PRETO") entao {
@@ -66,16 +66,22 @@ tarefa parei {
 tarefa verificaCurva {
   se (cor(1) != "VERDE" e cor(2) != "VERDE" e cor(3) != "VERDE" e cor(4) != "VERDE") entao {
     se (cor(1) != "PRETO" e cor(4) != "PRETO") entao {
-      enquanto (cor(1) != "PRETO" e cor(4) != "PRETO") farei {
+      zerartemporizador()
+      enquanto (cor(1) != "PRETO" e cor(4) != "PRETO" e temporizador() < 2500) farei {
         tras(50)
       }
       parar()
     }
   }
 
+  se (temporizador() < 2500) entao {
+    parartarefa()
+  }
+  zerartemporizador()
+
   se (cor(1) == "PRETO" e cor(4) == "PRETO") entao {
     travessa = verdadeiro
-  } senao se ((cor(1) == "VERDE" ou cor(2) == "VERDE") e (cor(3) == "VERDE" ou cor(4) == "VERDE")) entao {
+  } senao se ((cor(1) == "VERDE" e cor(3) == "VERDE") ou (cor(2) == "VERDE" e cor(4) == "VERDE")) entao {
     travessa = verdadeiro
   } senao se (cor(1) == "PRETO" e cor(4) != "PRETO") entao {
     viraDireita = verdadeiro
@@ -334,7 +340,7 @@ tarefa pegaVitimaVertical {
     parar()
   } senao se (ultra(1) > 500) entao {
     enquanto (ultra(1) > 75) farei {
-      se (((corverde(2) < 40) e (corvermelha(2) < 20) ou temporizador() >= 3900)) entao {
+      se (((corverde(2) < 40) e (corvermelha(2) < 20) ou temporizador() >= 4250)) entao {
         parar()
         interromper()
       } senao {
