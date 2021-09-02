@@ -6,6 +6,7 @@
 	⚙ OBR - Gears-Tet ⚙
 </h1>
 <h4 align="center">🚧 🧾 Projeto  e Programação 👨‍💻 Em construção... 🚧</h4>
+<h6 align="center">✅ Estadual Simulação (1º lugar no Paraná) | ❎ Estadual Apresentação</h6>
 
 <p align="center">  
 	<a href="#sobre-a-equipe">Sobre a Equipe</a> •
