@@ -1,7 +1,7 @@
 # USANDO O ROBÔ 3
 
 # VARIAVEIS
-numero horario = 15.75
+numero horario = 12
 
 booleano viraEsquerda = falso
 booleano viraDireita = falso
@@ -91,7 +91,10 @@ tarefa curvaEmPreto {
   paradinha()
   confirmaSeEstaNaCurva()
 
-  se (tempoEsgotou) entao { parartarefa() }
+  se (tempoEsgotou) entao {
+    reiniciaVariaveisDeCurva()
+    parartarefa()
+  }
   senao { verificaLadoPreto() }
 
   frenterotacao(300, 6)
@@ -128,7 +131,10 @@ tarefa curvaEmVerde {
   paradinha()
   confirmaSeEstaNaCurva()
 
-  se (tempoEsgotou) entao { parartarefa() }
+  se (tempoEsgotou) entao {
+    reiniciaVariaveisDeCurva()
+    parartarefa()
+  }
   senao { verificaLadoVerde() }
 
   frenterotacao(300, 16) 
@@ -168,6 +174,8 @@ tarefa pegaKitDeResgate {
   #
   # tras(300)
   # esperar(tempoDeRetorno)
+  parar()
+  esperar(10)
 
   frente(300)
   esperar(1000)
