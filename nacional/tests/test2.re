@@ -13,6 +13,8 @@ booleano tempoEsgotou = falso
 numero contagemGenerica = 0
 booleano primeiroDesvio = falso
 
+numero canto = 0
+
 booleano resgateFinalizado = falso
 
 # TAREFAS DE CONTROLE DO ROBÔ
@@ -49,8 +51,10 @@ tarefa alinhaReto {
       alinhamento = negativo(modulo(direcao() - 270))
     }
 
-    escrevernumero(1, arredondar(alinhamento) )
-    rotacionar(150, arredondar(alinhamento))
+    alinhamento = arredondar(alinhamento)
+
+    se (alinhamento == 0 ou alinhamento == 359) entao { parartarefa() }
+    rotacionar(150, alinhamento)
   }
   contagemGenerica = 0
 }
@@ -328,9 +332,56 @@ tarefa pegaKitDeResgate {
   parar()
 }
 
-tarefa resgate {
+tarefa procuraAreaDeResgatePelaDireita {
+  canto = 1
+  enquanto (verdadeiro) farei {
+    se (corvermelha(5) < 3 e cor(5) == "PRETO") entao { interromper() }
+    senao se (ultra(1) < 12) entao { rotacionar(500, negativo(90)) canto = canto + 1 }
+    senao { frente(300) }
+  }
+}
+
+tarefa procuraAreaDeResgatePelaEsquerda {
+  canto = 1
+  enquanto (verdadeiro) farei {
+    se (corvermelha(5) < 3 e cor(5) == "PRETO") entao { interromper() }
+    senao se (ultra(1) < 12) entao { rotacionar(500, 90) canto = canto + 1 }
+    senao { frente(300) }
+  }
+}
+
+tarefa salaDeResgate {
   escrever(1, "cheguei na sala")
+  frenterotacao(300, 25)
+  alinhaReto()
+
+  se (ultra(1) < 400) entao {
+    se (ultra(3) < ultra(2) e ultra(3) < 100) entao { procuraAreaDeResgatePelaEsquerda() }
+    senao se (ultra(2) < ultra(3) e ultra(2) < 100) entao { procuraAreaDeResgatePelaDireita() }
+
+  } senao se (ultra(1) > 400) entao {
+    se (ultra(3) < ultra(2) e ultra(3) < 100) entao {
+      rotacionar(500, 90)
+      alinhaReto()
+      procuraAreaDeResgatePelaDireita()
+    }
+    senao se (ultra(2) < ultra(3) e ultra(2) < 100) entao {
+      rotacionar(500, negativo(90))
+      alinhaReto()
+      procuraAreaDeResgatePelaEsquerda()
+    }
+  }
+
+  escrevernumero(1, canto)
+
   parei()
+
+  #se ultra()
+
+  #procuraAreaDeResgate()
+
+  
+
 }
 
 
@@ -348,7 +399,7 @@ inicio
     se ( (58 < luz(1) e luz(1) < 60) e (58 < luz(2) e luz(2) < 60)
       e (58 < luz(3) e luz(3) < 60) e (58 < luz(4) e luz(4) < 60))
       entao { 
-        resgate()
+        salaDeResgate()
         resgateFinalizado = verdadeiro
     } senao {
       se (ultra(1) <= 10 e cor(5) != "BRANCO") entao {
