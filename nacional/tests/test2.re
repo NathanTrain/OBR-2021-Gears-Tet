@@ -4,6 +4,7 @@
 numero horario = 9.75
 
 numero alinhamento = 0
+numero tempoDeRetorno = 0
 
 booleano viraEsquerda = falso
 booleano viraDireita = falso
@@ -14,6 +15,9 @@ numero contagemGenerica = 0
 booleano primeiroDesvio = falso
 
 numero canto = 0
+numero vitima = 0
+numero distanciaDaVitima = 0
+booleano vitimaViva = verdadeiro
 
 booleano resgateFinalizado = falso
 
@@ -306,6 +310,7 @@ tarefa levantaGarra {
 tarefa pegaKitDeResgate {
   tras(300)
   esperar(515) # +/- 15 rotações
+  parar()
   abaixaGarra()
 
   # AGUARDANDO ATUALIZAÇÃO PARA UTILIZAR ESTA FUNCIONALIDADE
@@ -332,22 +337,128 @@ tarefa pegaKitDeResgate {
   parar()
 }
 
+tarefa despejaObjeto {
+  abaixaGarra()
+  girarbaixo(250)
+  esperar(750)
+  girarcima(250)
+  levantaGarra()
+}
+
 tarefa procuraAreaDeResgatePelaDireita {
   canto = 1
   enquanto (verdadeiro) farei {
     se (corvermelha(5) < 3 e cor(5) == "PRETO") entao { interromper() }
-    senao se (ultra(1) < 12) entao { rotacionar(500, negativo(90)) canto = canto + 1 }
-    senao { frente(300) }
+    senao se (ultra(1) < 12) entao {
+      trasrotacao(300, 10)
+      rotacionar(500, negativo(90))
+      alinhaReto()
+      canto = canto + 1
+    } senao { frente(300) }
   }
+  parar()
+
+  rotacionar(500, 45)
+  paradinha()
+  despejaObjeto()
+
+  rotacionar(500, negativo(90))
+  enquanto (ultra(1) > 17) farei { frente(150) }
+  parar()
+  rotacionar(500, negativo(45))
 }
 
 tarefa procuraAreaDeResgatePelaEsquerda {
   canto = 1
   enquanto (verdadeiro) farei {
     se (corvermelha(5) < 3 e cor(5) == "PRETO") entao { interromper() }
-    senao se (ultra(1) < 12) entao { rotacionar(500, 90) canto = canto + 1 }
-    senao { frente(300) }
+    senao se (ultra(1) < 12) entao {
+      trasrotacao(300, 10)
+      rotacionar(500, 90)
+      alinhaReto()
+      canto = canto + 1
+    } senao { frente(300) }
   }
+  parar()
+
+  rotacionar(500, negativo(45))
+  paradinha()
+  despejaObjeto()
+
+  rotacionar(500, 90)
+  enquanto (ultra(1) > 17) farei { frente(150) }
+  parar()
+  rotacionar(500, 45)
+}
+
+tarefa procuraVitimaNaDireita {
+  enquanto (verdadeiro) farei {
+    se (temalgo(2, 15, 215)) entao {
+      distanciaDaVitima = ultra(2)-23
+      interromper()
+    }
+    senao se (ultra(1) < 12) entao { rotacionar(500, 90) }
+    senao { frente(150) }
+  }
+}
+
+tarefa procuraVitimaNaEsquerda {
+  enquanto (verdadeiro) farei {
+    se (temalgo(3, 15, 215)) entao {
+      distanciaDaVitima = ultra(3)-23
+      interromper()
+    }
+    senao se (ultra(1) < 12) entao { rotacionar(500, negativo(90)) }
+    senao { frente(150) }
+  }
+}
+
+tarefa verificaSeEstaViva {
+  distanciaDaVitima = arredondar((distanciaDaVitima / 28) * 1000)
+  zerartemporizador()
+  enquanto (temporizador() <= distanciaDaVitima) farei {
+    se (corvermelha(5) == corverde(5)) entao {
+      se (8 < corvermelha(5) e corvermelha(5) < 11) entao {
+        vitimaViva = falso
+        interromper()
+      } senao { frente(150) }
+    } senao { frente(150) }
+  }
+  tempoDeRetorno = temporizador() + 500
+}
+
+tarefa pegaVitima {
+  trasrotacao(300, 10)
+
+  abaixaGarra()
+  enquanto (temvitima() == falso e (temporizador() - tempoDeRetorno - 1250) < 3000 )
+  farei { frente(150) }
+  frenterotacao(150, 5)
+  tempoDeRetorno = temporizador()
+  levantaGarra()
+
+  se (temvitima() == falso) entao {
+    abaixaGarra()
+    enquanto (temvitima() == falso) farei { frente(150) }
+    levantaGarra()
+  }
+}
+
+tarefa entregaVitima {
+  rotacionar(500, 90)
+  enquanto (cor(5) != "PRETO") farei { frente(300) }
+  frente(200) esperar(500)
+  parar()
+
+  rotacionar(500, 45)
+  frente(100) esperar(500)
+  parar()
+  despejaObjeto()
+  vitima = vitima + 1
+
+  trasrotacao(300, 5)
+  rotacionar(500, negativo(225))
+  alinhaReto()
 }
 
 tarefa salaDeResgate {
@@ -366,6 +477,7 @@ tarefa salaDeResgate {
       procuraAreaDeResgatePelaDireita()
     }
     senao se (ultra(2) < ultra(3) e ultra(2) < 100) entao {
+      frenterotacao(300, 14)
       rotacionar(500, negativo(90))
       alinhaReto()
       procuraAreaDeResgatePelaEsquerda()
@@ -374,13 +486,48 @@ tarefa salaDeResgate {
 
   escrevernumero(1, canto)
 
+  alinhaReto()
+  vitima = 0
+
+  se (ultra(2) < 50) entao {
+    enquanto (vitima <= 3 ) farei {
+      procuraVitimaNaEsquerda()
+      frenterotacao(300, 6)
+      rotacionar(500, 90)
+      escrever(1, "achei")
+      parei()
+    }
+  } senao se (ultra(3) < 50) entao {
+    enquanto (vitima <= 3 ) farei {
+      escrevernumero(1, vitima)
+      procuraVitimaNaDireita()
+      frenterotacao(300, 6)
+      rotacionar(500, 90)
+
+      alinhaReto()
+      se (vitima < 2) entao {
+        verificaSeEstaViva()
+        se (vitimaViva) entao { pegaVitima() }
+      } senao {
+        distanciaDaVitima = arredondar((distanciaDaVitima / 28) * 1000)
+        frente(150)
+        esperar(distanciaDaVitima)
+        parar()
+        pegaVitima()
+      }
+
+      tras(300) esperar(arredondar(tempoDeRetorno / 1.5)) parar()
+      frenterotacao(300, 12)
+      alinhaReto()
+
+      se (temvitima()) entao { entregaVitima() }
+      senao { rotacionar(500, negativo(90)) frenterotacao(300, 6) }
+
+      vitimaViva = verdadeiro
+    }
+  }
+
   parei()
-
-  #se ultra()
-
-  #procuraAreaDeResgate()
-
-  
 
 }
 
