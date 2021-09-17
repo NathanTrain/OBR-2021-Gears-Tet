@@ -6,6 +6,7 @@
 	⚙ OBR - Gears-Tet ⚙
 </h1>
 <h4 align="center">🚧 🧾 Projeto  e Programação 👨‍💻 Em construção... 🚧</h4>
+<h6 align="center">✅ Estadual Simulação (1º lugar no Paraná) | ❎ Estadual Apresentação</h6>
 
 <p align="center">  
 	<a href="#sobre-a-equipe">Sobre a Equipe</a> •
@@ -73,7 +74,7 @@ Atualmente nossa equipe conta com quatro integrantes e um mentor:
 </tr>
 </table>
 
-## Apresentação
+## ❎ Apresentação
 Para a Prática - Apresentação, fizemos um vídeo no tema **Inovação**, baseando-se em uma ideia passada por gerações e que esse ano finalmente saiu do papel: 
 <h4>Fazer uma <u>base giratória</u> com sua parte superior <u>fixa em relação ao chão</u></h4>
 
@@ -83,7 +84,7 @@ No vídeo, o robô é criado a partir do sonho que um dos integrantes teve, mas 
 
 O nome do robô, Magni, vem do filho de Thor da mitologia nórdica, como explicado no vídeo.
 
-## Simulação
+## ✅ Simulação
 Para a Prática - Simulação utilizamos da linguagem rEduc do simulador Sbotics (próprio da competição) junto do Robô 3 (Firetrekker) com o atuador Empilhadeira.
 
 <div align="center" >
