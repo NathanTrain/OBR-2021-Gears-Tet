@@ -1,12 +1,17 @@
 # USANDO O ROBÔ 3
 
 # VARIAVEIS
-numero horario = 12
+numero horario = 9.75
+
+numero alinhamento = 0
 
 booleano viraEsquerda = falso
 booleano viraDireita = falso
 booleano travessa = falso
 booleano tempoEsgotou = falso
+
+numero contagemGenerica = 0
+booleano primeiroDesvio = falso
 
 booleano resgateFinalizado = falso
 
@@ -24,8 +29,130 @@ tarefa segueLinha {
 tarefa paradinha { parar() esperar(250) }
 tarefa parei { enquanto (verdadeiro) farei { parar() } }
 
+tarefa alinhaReto {
+  para contagemGenerica de 0 ate 2 passo 1 farei {
+    se ((0 < direcao()) e (direcao() < 45)) entao {
+      alinhamento = negativo(modulo(direcao()))
+    } senao se ((315 < direcao()) e (direcao() < 359)) entao {
+      alinhamento = modulo(360 - direcao())
+    } senao se ((45 < direcao()) e (direcao() <= 90)) entao {
+      alinhamento = modulo(90 - direcao())
+    } senao se ((90 <= direcao()) e (direcao() < 135)) entao {
+      alinhamento = negativo(modulo(direcao() - 90))
+    } senao se ((135 < direcao()) e (direcao() <= 180)) entao {
+      alinhamento = modulo(180 - direcao())
+    } senao se ((180 <= direcao()) e (direcao() < 225)) entao {
+      alinhamento = negativo(modulo(direcao() - 180))
+    } senao se ((225 < direcao()) e (direcao() <= 270)) entao {
+      alinhamento = modulo(270 - direcao())
+    } senao se ((270 <= direcao()) e (direcao() < 315)) entao {
+      alinhamento = negativo(modulo(direcao() - 270))
+    }
+
+    escrevernumero(1, arredondar(alinhamento) )
+    rotacionar(150, arredondar(alinhamento))
+  }
+  contagemGenerica = 0
+}
+
 # TAREFAS DE DESVIO DE OBSTÁCULO
 
+tarefa primeiroLado {
+  enquanto (cor(2) != "PRETO" e cor(3) != "PRETO" e cor(4) != "PRETO" e ultra(3) > 5)
+  farei { 
+    se (cor(4) == "VERMELHO") entao { interromper() }
+    frente(300)
+  }
+
+  paradinha()
+
+  se (cor(4) == "VERMELHO") entao { 
+    rotacionar(500, negativo(30))
+  } senao se (cor(2) == "PRETO" ou cor(3) == "PRETO" ou cor(4) == "PRETO") entao {
+    enquanto (cor(1) != "PRETO") farei { frente(100) }
+    frenterotacao(300, 12)
+    rotacionar(500, 60)
+    enquanto (toque(1) == falso) farei { tras(150) }
+    parartarefa()
+  } senao {
+    frenterotacao(300, 4)
+  }
+
+  rotacionar(500, negativo(30))
+  paradinha()
+  enquanto (ultra(3) > 20) farei { frente(100) }
+  enquanto (ultra(3) < 20) farei { frente(100) }
+  frenterotacao(300, 3)
+  rotacionar(500, negativo(45))
+  parar()
+}
+
+tarefa segundoLado {
+  zerartemporizador()
+  enquanto (cor(2) != "PRETO" e cor(3) != "PRETO" 
+  e cor(4) != "PRETO" e ultra(3) < 20)
+  farei { 
+    se (cor(4) == "VERMELHO") entao { interromper() }
+    frente(300)
+  }
+  parar()
+
+  se (cor(4) == "VERMELHO") entao {
+    rotacionar(500, negativo(45))
+  } senao se (cor(2) == "PRETO" ou cor(3) == "PRETO" ou cor(4) == "PRETO") entao {
+    enquanto (cor(1) != "PRETO") farei { frente(100) }
+    frenterotacao(300, 10)
+    rotacionar(500, 45)
+    enquanto (toque(1) == falso) farei { tras(150) }
+    parartarefa()
+  } senao {
+    frenterotacao(300, 4)
+    rotacionar(500, negativo(45))
+  }
+
+  paradinha()
+  alinhaReto()
+  rotacionar(500, negativo(45))
+  parar()
+}
+
+tarefa terceiroLado {
+  zerartemporizador()
+  enquanto (cor(2) != "PRETO" e cor(3) != "PRETO" 
+  e cor(4) != "PRETO" e temporizador() < 850)
+  farei { 
+    se (cor(4) == "VERMELHO") entao { interromper() }
+    frente(300)
+  }
+  parar()
+
+  se (cor(4) == "VERMELHO") entao {
+    rotacionar(500, 45)
+    enquanto (toque(1) == falso) farei { tras(150) }
+  } senao se (cor(2) == "PRETO" ou cor(3) == "PRETO" ou cor(4) == "PRETO") entao {
+    enquanto (cor(1) != "PRETO") farei { frente(100) }
+    frenterotacao(300, 10)
+    rotacionar(500, 45)
+    alinhaReto()
+    enquanto (toque(1) == falso) farei { tras(150) }
+  }
+}
+
+tarefa desvioDeObstaculo {
+  paradinha()
+  alinhaReto()
+
+  enquanto (ultra(1) < 25) farei { tras(300) }
+  rotacionar(500, 30)
+
+  primeiroLado()
+  se (toque(1)) entao { parartarefa() }
+
+  segundoLado()
+  se (toque(1)) entao { parartarefa() }
+
+  terceiroLado()
+}
 
 # TAREFAS DE CURVAS
 
@@ -89,6 +216,18 @@ tarefa virandoEsquerdaPosPreto {
 
 tarefa curvaEmPreto {
   paradinha()
+
+  se (cor(1) != "PRETO" e cor(2) != "PRETO"
+  e cor(3) != "PRETO" e cor(4) != "PRETO") entao {
+    se (corvermelha(1) < 20) entao {
+      enquanto (cor(3) != "PRETO") farei { esquerda(1000) }
+      parartarefa()
+    } senao se (corvermelha(4) < 20) entao {
+      enquanto (cor(2) != "PRETO") farei { direita(1000) }
+      parartarefa()
+    }
+  }
+
   confirmaSeEstaNaCurva()
 
   se (tempoEsgotou) entao {
@@ -161,7 +300,8 @@ tarefa levantaGarra {
 }
 
 tarefa pegaKitDeResgate {
-  trasrotacao(300, 15)
+  tras(300)
+  esperar(515) # +/- 15 rotações
   abaixaGarra()
 
   # AGUARDANDO ATUALIZAÇÃO PARA UTILIZAR ESTA FUNCIONALIDADE
@@ -170,7 +310,7 @@ tarefa pegaKitDeResgate {
   # enquanto (temkit() == falso) {
   #   frente(300)
   # }
-  # tempoDeRetorno = temporizador() - 250
+  # tempoDeRetorno = temporizador() - 600
   #
   # tras(300)
   # esperar(tempoDeRetorno)
@@ -211,8 +351,8 @@ inicio
         resgate()
         resgateFinalizado = verdadeiro
     } senao {
-      se (ultra(1) < 25 e cor(5) != "BRANCO") entao {
-        # desvioDeObstaculo()
+      se (ultra(1) <= 10 e cor(5) != "BRANCO") entao {
+        desvioDeObstaculo()
       } senao se ((19 < corvermelha(5) e corvermelha(5) < 21) 
         e (39 < corverde(5) e corverde(5) < 41) 
         e (56 < corazul(5) e corazul(5) < 58)) 
@@ -222,7 +362,8 @@ inicio
         se (cor(1) == "VERDE" ou cor(2) == "VERDE"
         ou cor(3) == "VERDE" ou cor(4) == "VERDE") entao {
           curvaEmVerde()
-        } senao se (cor(1) == "PRETO" ou cor(4) == "PRETO") entao {
+        } senao se (corvermelha(1) < 25 ou cor(1) == "PRETO"
+        ou corvermelha(4) < 25 ou cor(4) == "PRETO") entao {
           curvaEmPreto()
         } senao {
           se (resgateFinalizado e (corvermelha(2) > 60 e corazul(2) > 10)) entao {
