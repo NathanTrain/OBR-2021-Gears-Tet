@@ -1,7 +1,7 @@
 # USANDO O ROBÔ 3
 
 # VARIAVEIS
-numero horario = 9.75
+numero horario = 12
 
 numero alinhamento = 0
 numero tempoDeRetorno = 0
@@ -12,7 +12,7 @@ booleano travessa = falso
 booleano tempoEsgotou = falso
 
 numero contagemGenerica = 0
-booleano primeiroDesvio = falso
+booleano desvioEsquerda = falso
 
 numero canto = 0
 numero vitima = 0
@@ -65,8 +65,8 @@ tarefa alinhaReto {
 
 # TAREFAS DE DESVIO DE OBSTÁCULO
 
-tarefa primeiroLado {
-  enquanto (cor(2) != "PRETO" e cor(3) != "PRETO" e cor(4) != "PRETO" e ultra(3) > 5)
+tarefa primeiroLadoDireita {
+  enquanto (cor(2) != "PRETO" e cor(3) != "PRETO" e cor(4) != "PRETO" e ultra(3) > 7)
   farei { 
     se (cor(4) == "VERMELHO") entao { interromper() }
     frente(300)
@@ -95,7 +95,7 @@ tarefa primeiroLado {
   parar()
 }
 
-tarefa segundoLado {
+tarefa segundoLadoDireita {
   zerartemporizador()
   enquanto (cor(2) != "PRETO" e cor(3) != "PRETO" 
   e cor(4) != "PRETO" e ultra(3) < 20)
@@ -124,20 +124,14 @@ tarefa segundoLado {
   parar()
 }
 
-tarefa terceiroLado {
+tarefa terceiroLadoDireita {
   zerartemporizador()
   enquanto (cor(2) != "PRETO" e cor(3) != "PRETO" 
   e cor(4) != "PRETO" e temporizador() < 850)
-  farei { 
-    se (cor(4) == "VERMELHO") entao { interromper() }
-    frente(300)
-  }
+  farei { frente(300) }
   parar()
 
-  se (cor(4) == "VERMELHO") entao {
-    rotacionar(500, 45)
-    enquanto (toque(1) == falso) farei { tras(150) }
-  } senao se (cor(2) == "PRETO" ou cor(3) == "PRETO" ou cor(4) == "PRETO") entao {
+  se (cor(2) == "PRETO" ou cor(3) == "PRETO" ou cor(4) == "PRETO") entao {
     enquanto (cor(1) != "PRETO") farei { frente(100) }
     frenterotacao(300, 10)
     rotacionar(500, 45)
@@ -146,20 +140,80 @@ tarefa terceiroLado {
   }
 }
 
+tarefa primeiroLadoEsquerda {
+  enquanto (cor(2) != "PRETO" e cor(3) != "PRETO" e cor(1) != "PRETO" e ultra(2) > 7)
+  farei { 
+    se (cor(1) == "VERMELHO") entao { interromper() }
+    frente(300)
+  }
+  parar()
+
+  paradinha()
+
+  se (cor(1) == "VERMELHO") entao { 
+    rotacionar(500, 30)
+  } senao se (cor(2) == "PRETO" ou cor(3) == "PRETO" ou cor(1) == "PRETO") entao {
+    enquanto (cor(4) != "PRETO") farei { frente(100) }
+    frenterotacao(300, 12)
+    rotacionar(500, negativo(60))
+    enquanto (toque(1) == falso) farei { tras(150) }
+    parartarefa()
+  } senao {
+    frenterotacao(300, 4)
+  }
+
+  rotacionar(500, 30)
+  paradinha()
+  enquanto (ultra(2) > 20) farei { frente(100) }
+  enquanto (ultra(2) < 20) farei { frente(100) }
+  frenterotacao(300, 3)
+  rotacionar(500, 45)
+  parar()
+}
+
+tarefa segundoLadoEsquerda {
+  zerartemporizador()
+  enquanto (cor(2) != "PRETO" e cor(3) != "PRETO" 
+  e cor(1) != "PRETO" e ultra(2) < 20)
+  farei { frente(300) }
+  parar()
+
+  se (cor(2) == "PRETO" ou cor(3) == "PRETO" ou cor(1) == "PRETO") entao {
+    enquanto (cor(4) != "PRETO") farei { frente(100) }
+    frenterotacao(300, 10)
+    rotacionar(500, negativo(45))
+    enquanto (toque(1) == falso) farei { tras(150) }
+    parartarefa()
+  } 
+}
+
 tarefa desvioDeObstaculo {
   paradinha()
   alinhaReto()
 
+  se (ultra(2) < 50) entao { desvioEsquerda = verdadeiro }
   enquanto (ultra(1) < 25) farei { tras(300) }
-  rotacionar(500, 30)
 
-  primeiroLado()
-  se (toque(1)) entao { parartarefa() }
+  se (desvioEsquerda) entao {
+    rotacionar(500, negativo(30))
 
-  segundoLado()
-  se (toque(1)) entao { parartarefa() }
+    primeiroLadoEsquerda()
+    se (toque(1)) entao { parartarefa() }
 
-  terceiroLado()
+    segundoLadoEsquerda()
+  } senao {
+    rotacionar(500, 30)
+
+    primeiroLadoDireita()
+    se (toque(1)) entao { parartarefa() }
+
+    segundoLadoDireita()
+    se (toque(1)) entao { parartarefa() }
+
+    terceiroLadoDireita()
+  }
+
+  desvioEsquerda = falso
 }
 
 # TAREFAS DE CURVAS
@@ -313,28 +367,18 @@ tarefa pegaKitDeResgate {
   parar()
   abaixaGarra()
 
-  # AGUARDANDO ATUALIZAÇÃO PARA UTILIZAR ESTA FUNCIONALIDADE
-  # zerartemporizador()
-  # 
-  # enquanto (temkit() == falso) {
-  #   frente(300)
-  # }
-  # tempoDeRetorno = temporizador() - 600
-  #
-  # tras(300)
-  # esperar(tempoDeRetorno)
-  parar()
-  esperar(10)
-
-  frente(300)
-  esperar(1000)
-  parar()
+  zerartemporizador()
+  enquanto (temKit() == falso) farei {
+    frente(150)
+  }
+  esperar(400)
+  tempoDeRetorno = temporizador() - 515
 
   levantaGarra()
-
   tras(300)
-  esperar(500)
+  esperar(tempoDeRetorno)
   parar()
+  esperar(10)
 }
 
 tarefa despejaObjeto {
@@ -396,9 +440,11 @@ tarefa procuraVitimaNaDireita {
     se (temalgo(2, 15, 215)) entao {
       distanciaDaVitima = ultra(2)-23
       interromper()
-    }
-    senao se (ultra(1) < 12) entao { rotacionar(500, 90) }
-    senao { frente(150) }
+    } senao se (ultra(1) < 12) entao {
+      vitima = 2
+      enquanto (toque(1) == falso) farei { tras(300) }
+      parartarefa()
+    } senao { frente(150) }
   }
 }
 
@@ -436,12 +482,6 @@ tarefa pegaVitima {
   frenterotacao(150, 5)
   tempoDeRetorno = temporizador()
   levantaGarra()
-
-  se (temvitima() == falso) entao {
-    abaixaGarra()
-    enquanto (temvitima() == falso) farei { frente(150) }
-    levantaGarra()
-  }
 }
 
 tarefa entregaVitima {
@@ -498,7 +538,7 @@ tarefa salaDeResgate {
       parei()
     }
   } senao se (ultra(3) < 50) entao {
-    enquanto (vitima <= 3 ) farei {
+    enquanto (vitima < 3 ) farei {
       escrevernumero(1, vitima)
       procuraVitimaNaDireita()
       frenterotacao(300, 6)
@@ -510,9 +550,10 @@ tarefa salaDeResgate {
         se (vitimaViva) entao { pegaVitima() }
       } senao {
         distanciaDaVitima = arredondar((distanciaDaVitima / 28) * 1000)
-        frente(150)
-        esperar(distanciaDaVitima)
+        zerartemporizador()
+        enquanto (temporizador() < distanciaDaVitima) farei { frente(150) }
         parar()
+        tempoDeRetorno = temporizador() + 500
         pegaVitima()
       }
 
@@ -543,8 +584,7 @@ inicio
   fechar(50)
 
   enquanto (verdadeiro) farei {
-    se ( (58 < luz(1) e luz(1) < 60) e (58 < luz(2) e luz(2) < 60)
-      e (58 < luz(3) e luz(3) < 60) e (58 < luz(4) e luz(4) < 60))
+    se ((42 < corvermelha(3) e corvermelha(3) < 46) e (52 < corazul(3) e corazul(3) < 56))
       entao { 
         salaDeResgate()
         resgateFinalizado = verdadeiro
