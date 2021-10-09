@@ -1,7 +1,7 @@
 # USANDO O ROBÔ 3
 
 # VARIAVEIS
-numero horario = 16.75
+numero horario = 9.5
 
 numero alinhamento = 0
 numero tempoDeRetorno = 0
@@ -13,6 +13,9 @@ booleano tempoEsgotou = falso
 
 numero contagemGenerica = 0
 booleano desvioEsquerda = falso
+
+numero diferencaDeCorSensor2 = 0
+numero diferencaDeCorSensor3 = 0
 
 booleano vitimaNaEsquerda = falso
 booleano vitimaNaDireita = falso
@@ -233,6 +236,7 @@ tarefa reiniciaVariaveisDeCurva {
 }
 
 tarefa confirmaSeEstaNaCurva {
+  escrever(1, "confirma curva")
   se (cor(1) != "VERDE" e cor(2) != "VERDE" e cor(3) != "VERDE" e cor(4) != "VERDE") entao {
     se (cor(1) != "PRETO" e cor(4) != "PRETO") entao {
       zerartemporizador()
@@ -246,7 +250,10 @@ tarefa confirmaSeEstaNaCurva {
       }
     }
   }
+  limparconsole()
 }
+
+# CURVA PRETO
 
 tarefa verificaLadoPreto {
   se (cor(1) == "PRETO" e cor(4) == "PRETO") entao {
@@ -289,10 +296,10 @@ tarefa curvaEmPreto {
   se (cor(1) != "PRETO" e cor(2) != "PRETO"
   e cor(3) != "PRETO" e cor(4) != "PRETO") entao {
     se (corvermelha(1) < 20) entao {
-      enquanto (cor(3) != "PRETO") farei { esquerda(1000) }
+      enquanto (cor(3) != "PRETO") farei { esquerda(1000) } parar()
       parartarefa()
     } senao se (corvermelha(4) < 20) entao {
-      enquanto (cor(2) != "PRETO") farei { direita(1000) }
+      enquanto (cor(2) != "PRETO") farei { direita(1000) } parar()
       parartarefa()
     }
   }
@@ -314,6 +321,7 @@ tarefa curvaEmPreto {
   reiniciaVariaveisDeCurva()
 }
 
+# CURVA VERDE
 
 tarefa virandoDireitaPosVerde {
   rotacionar(500, 30)
@@ -369,8 +377,7 @@ tarefa levantaGarra {
 }
 
 tarefa pegaKitDeResgate {
-  tras(300)
-  esperar(515) # +/- 15 rotações
+  tras(300) esperar(515) # +/- 15 rotações
   parar()
   abaixaGarra()
 
@@ -383,7 +390,7 @@ tarefa pegaKitDeResgate {
 
   levantaGarra()
   tras(300)
-  esperar(tempoDeRetorno)
+  esperar(tempoDeRetorno / 2)
   parar()
   esperar(10)
 }
@@ -410,8 +417,6 @@ tarefa verificaTamanhoLado {
     ladoMaior = falso
     ladoMenor = verdadeiro
   }
-  escreverbooleano(1, ladoMaior)
-  escreverbooleano(2, ladoMenor)
 }
 
 tarefa inverteTamanhoLado {
@@ -422,8 +427,6 @@ tarefa inverteTamanhoLado {
     ladoMaior = verdadeiro
     ladoMenor = falso
   }
-  escreverbooleano(1, ladoMaior)
-  escreverbooleano(2, ladoMenor)
 }
 
 tarefa procuraAreaComParedeNaDireita {
@@ -732,30 +735,37 @@ tarefa procuraSaidaNaEsquerda {
 }
 
 tarefa salaDeResgate {
+  escrever(1, "entrou na sala")
   frenterotacao(300, 25)
   alinhaReto()
 
-  se (ultra(1) > 400) entao { 
-    mudouDirecao = verdadeiro
+  se (ultra(1) > 400 ou (ultra(3) > 100 e ultra(2) > 100)) entao {
     frenterotacao(300, 10)
-    se (ultra(3) < 100 ou ultra(3) < ultra(2) e ultra(3) < 400) entao {
+    se (ultra(3) < 100) entao {
+      vitimaNaEsquerda = verdadeiro
       rotacionar(500, 90)
-    } senao se (ultra(2) < 100 ou ultra(2) < ultra(3) e ultra(2) < 400) entao {
+    } senao se (ultra(2) < 100) entao {
+      vitimaNaDireita = verdadeiro
       rotacionar(500, negativo(90))
-    }
-    enquanto (toque(1) == falso) farei { tras(300) }
+    } senao {
+      se (ultra(3) < ultra(2) e ultra(3) < 400) entao {
+        vitimaNaDireita = verdadeiro
+        rotacionar(500, negativo(90))
+      } senao se (ultra(2) < ultra(3) e ultra(2) < 400) entao {
+        vitimaNaEsquerda = verdadeiro
+        rotacionar(500, 90)
+      }
+    }    
     parar()
     alinhaReto()
   }
 
   verificaTamanhoLado()
-  se ( mudouDirecao ) entao { frenterotacao(300, 40) }
-  mudouDirecao = falso
 
-  se (ultra(3) < 100) entao {
+  se (ultra(3) < 100 ou vitimaNaDireita) entao {
     vitimaNaDireita = verdadeiro
     procuraAreaComParedeNaEsquerda()
-  } senao se (ultra(2) < 100) entao { 
+  } senao se (ultra(2) < 100 ou vitimaNaEsquerda) entao {
     vitimaNaEsquerda = verdadeiro
     procuraAreaComParedeNaDireita()
   }
@@ -842,21 +852,23 @@ tarefa salaDeResgate {
   senao se (vitimaNaDireita) entao { procuraSaidaNaEsquerda() }
 }
 
-
 inicio
-  se ((horario < 8) ou (16 < horario)) entao { ajustarcor(45) }
-  senao se (((8 <= horario) e (horario < 11))
-    ou ((13 < horario) e (horario <= 16))) entao  { ajustarcor(35) }
-  senao { ajustarcor(30) }
+  ajustarcor(45)
+  #se ((horario < 8) ou (16 < horario)) entao { ajustarcor(45) }
+  #senao se (((8 <= horario) e (horario < 11))
+  #  ou ((13 < horario) e (horario <= 16))) entao  { ajustarcor(45) }
+  #senao { ajustarcor(45) }
 
   velocidadeatuador(150)
   levantar(1000)
   fechar(50)
 
   enquanto (verdadeiro) farei {
-    se (42 < corvermelha(2) e corvermelha(2) < 55
-      e 45 < corverde(2) e corverde(2) < 59
-      e 52 < corazul(2) e corazul(2) < 68)
+    diferencaDeCorSensor2 = arredondar(corazul(2) - corverde(2))
+    diferencaDeCorSensor3 = arredondar(corazul(3) - corverde(3))
+    se ((cor(2) == cor(3) e (cor(2) == "CIANO" ou cor(2) == "AZUL"))
+    ou (diferencaDeCorSensor2 == diferencaDeCorSensor3
+    e 6 <= diferencaDeCorSensor2 e diferencaDeCorSensor2 <= 11 ))
       entao { 
         salaDeResgate()
         resgateFinalizado = verdadeiro
@@ -876,8 +888,7 @@ inicio
         ou corvermelha(4) < 25 ou cor(4) == "PRETO") entao {
           curvaEmPreto()
         } senao {
-          se (resgateFinalizado e ((corvermelha(2) > 60 e corverde(2) < 16 e corazul(2) < 16)
-          ou (cor(2) == cor(3) e cor(2) == "VERMELHO")))
+          se (resgateFinalizado e (corvermelha(2) > 60 e corverde(2) < 16 e corazul(2) < 17))
           entao {
             frenterotacao(300, 5)
             parei()
