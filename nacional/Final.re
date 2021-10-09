@@ -279,13 +279,31 @@ tarefa verificaLadoVerde {
 }
 
 tarefa virandoDireitaPosPreto {
-  enquanto (cor(3) != "PRETO") farei { direita(1000) }
+  zerartemporizador()
+  enquanto (cor(3) != "PRETO") farei {
+    se (temporizador() >= 3333) entao {
+      parar()
+      trasrotacao(300, 5)
+      interromper()
+    } senao {
+      direita(1000)
+    }
+  }
   enquanto (cor(2) != "PRETO") farei { esquerda(1000) }
   parar()
 }
 
 tarefa virandoEsquerdaPosPreto {
-  enquanto (cor(2) != "PRETO") farei { esquerda(1000) }
+  zerartemporizador()
+  enquanto (cor(2) != "PRETO") farei {
+    se (temporizador() >= 3333) entao {
+      parar()
+      trasrotacao(300, 5)
+      interromper()
+    } senao {
+      esquerda(1000)
+    }
+  }
   enquanto (cor(3) != "PRETO") farei { direita(1000) }
   parar()
 }
