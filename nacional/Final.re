@@ -531,8 +531,8 @@ tarefa procuraVitimaNaEsquerda {
 tarefa verificaSeEstaViva {
   distanciaDaVitima = arredondar((distanciaDaVitima / 28) * 1000)
   zerartemporizador()
-  enquanto (temporizador() <= distanciaDaVitima) farei {
-    se ((9 < corvermelha(5) e corvermelha(5) < 13) ou cor(5) == "PRETO") entao {
+  enquanto (temporizador() <= distanciaDaVitima+100) farei {
+    se (cor(5) == "PRETO" ou (9 <= corvermelha(5) e corvermelha(5) <= 13)) entao {
       vitimaViva = falso
       interromper()
     } senao { frente(150) }
@@ -675,12 +675,15 @@ tarefa procuraSaidaNaDireita {
       frenterotacao(300, 3)
       rotacionar(500, 90)
       enquanto (verdadeiro) farei {
-        se (cor(2) != "BRANCO" ou (corvermelha(2) < 55 e corverde(2) < 59 e corazul(2) < 67))
+        se (cor(2) != "BRANCO"
+        ou (6 <= corazul(2) - corverde(2)
+        e corazul(2) - corverde(2) <= 11))
         entao { interromper() }
         senao { frente(75) }
       }
       parar()
-      se (30 < corverde(2) e corverde(2) < 38) entao {
+      se ((30 < corverde(2) e corverde(2) < 38)
+      ou (58 < corverde(2) e corverde(2) < 63) ou cor(2) == "VERDE") entao {
         trasrotacao(300, 5)
         rotacionar(500, negativo(90))
         frenterotacao(300, 12)
@@ -710,12 +713,15 @@ tarefa procuraSaidaNaEsquerda {
       frenterotacao(300, 3)
       rotacionar(500, negativo(90))
       enquanto (verdadeiro) farei {
-        se (cor(2) != "BRANCO" ou (corvermelha(2) < 55 e corverde(2) < 59 e corazul(2) < 67))
+        se (cor(2) != "BRANCO"
+        ou (6 <= corazul(2) - corverde(2)
+        e corazul(2) - corverde(2) <= 11))
         entao { interromper() }
         senao { frente(75) }
       }
       parar()
-      se (30 < corverde(2) e corverde(2) < 38) entao {
+      se ((30 < corverde(2) e corverde(2) < 38)
+      ou (58 < corverde(2) e corverde(2) < 63) ou cor(2) == "VERDE") entao {
         trasrotacao(300, 5)
         rotacionar(500, 90)
         frenterotacao(300, 15)
