@@ -713,7 +713,7 @@ tarefa procuraSaidaNaDireita {
       ou (58 < corverde(2) e corverde(2) < 68 e 21 < corvermelha(2) e corvermelha(2) < 27)) entao {
         trasrotacao(300, 5)
         rotacionar(500, negativo(90))
-        frenterotacao(300, 15)
+        frenterotacao(300, 16)
         rotacionar(500, 90)
         alinhaReto()
         enquanto (cor(2) == "BRANCO") farei { frente(100) }
@@ -763,7 +763,7 @@ tarefa procuraSaidaNaEsquerda {
       ou (58 < corverde(2) e corverde(2) < 63)) entao {
         trasrotacao(300, 5)
         rotacionar(500, 90)
-        frenterotacao(300, 15)
+        frenterotacao(300, 16)
         rotacionar(500, negativo(90))
         alinhaReto()
         enquanto (cor(2) == "BRANCO") farei { frente(100) }
@@ -820,8 +820,10 @@ tarefa salaDeResgate {
 
   se (ultra(3) < 100 ou vitimaNaDireita) entao {
     vitimaNaDireita = verdadeiro
+    vitimaNaEsquerda = falso
     procuraAreaComParedeNaEsquerda()
   } senao se (ultra(2) < 100 ou vitimaNaEsquerda) entao {
+    vitimaNaDireita = falso
     vitimaNaEsquerda = verdadeiro
     procuraAreaComParedeNaDireita()
   }
@@ -856,19 +858,21 @@ tarefa salaDeResgate {
     parartarefa()
   }
 
+  se (ultra(1) > 15) entao { trasrotacao(300, 2) }
+
   se (400 < ultra(3)) entao {
     trasrotacao(300, 5)
     rotacionar(500, negativo(90))
     alinhaReto()
 
     zerartemporizador()
-    enquanto (cor(2) == "BRANCO") farei { frente(150) } parar()
+    enquanto (cor(2) == "BRANCO" ou (corazul(2) - corvermelha(2)) >= 9) farei { frente(150) } parar()
     tempoDeRetorno = temporizador()
 
     se (cor(2) == "VERDE" ou cor(2) == "PRETO"
     ou (30 < corverde(2) e corverde(2) < 38 e 12 < corvermelha(2) e corvermelha(2) < 17)
     ou (58 < corverde(2) e corverde(2) < 68 e 21 < corvermelha(2) e corvermelha(2) < 27)) entao {
-      frenterotacao(300, 10)
+      frenterotacao(300, 7)
       alinhaReto()
       parartarefa()
     } senao {
@@ -890,13 +894,13 @@ tarefa salaDeResgate {
     alinhaReto()
 
     zerartemporizador()
-    enquanto (cor(2) == "BRANCO") farei { frente(150) } parar()
+    enquanto (cor(2) == "BRANCO" ou (corazul(2) - corvermelha(2)) >= 9) farei { frente(150) } parar()
     tempoDeRetorno = temporizador()
 
     se (cor(2) == "VERDE" ou cor(2) == "PRETO"
     ou (30 < corverde(2) e corverde(2) < 38 e 12 < corvermelha(2) e corvermelha(2) < 17)
     ou (58 < corverde(2) e corverde(2) < 68 e 21 < corvermelha(2) e corvermelha(2) < 27)) entao {
-      frenterotacao(300, 10)
+      frenterotacao(300, 7)
       alinhaReto()
       parartarefa()
     } senao {
@@ -939,7 +943,7 @@ inicio
       diferencaDeCorSensor3 = arredondar(corazul(3) - corvermelha(3))
     }
 
-    se (resgateConcluido == falso e (cor(2) == cor(3) e (cor(2) == "CIANO" ou cor(2) == "AZUL"))
+    se (resgateFinalizado == falso e (cor(2) == cor(3) e (cor(2) == "CIANO" ou cor(2) == "AZUL"))
     ou (diferencaDeCorSensor2 == diferencaDeCorSensor3
     e 8 <= diferencaDeCorSensor2 e diferencaDeCorSensor2 <= 16 ))
     entao { 
